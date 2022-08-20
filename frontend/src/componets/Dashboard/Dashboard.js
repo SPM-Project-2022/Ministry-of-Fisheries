@@ -96,7 +96,7 @@ const Dashboard = () => {
 
   const logoutHandler = () => {
     localStorage.removeItem("username");
-    localStorage.removeItem("authTaken");
+    localStorage.setItem("authToken", null);
     localStorage.removeItem("email");
     localStorage.removeItem("type");
     history("/");
