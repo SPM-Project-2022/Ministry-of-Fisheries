@@ -1,0 +1,20 @@
+.logo {
+  height: 32px;
+  margin: 16px;
+}
+
+.site-layout .site-layout-background {
+  background: #fff;
+}
+
+.img {
+  width: 100px;
+  height: 100px;
+}
+
+p{
+  color: white;
+  font-size: 30px;
+  text-align: center;
+  font-family: serif;
+}
