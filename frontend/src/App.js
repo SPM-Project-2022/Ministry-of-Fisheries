@@ -54,6 +54,14 @@ const App = () => {
               </PrivateRoute>
             }
           />
+          <Route
+            path="/manager-dashboard/:username"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </Router>
       <>

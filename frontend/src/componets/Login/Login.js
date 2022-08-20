@@ -62,6 +62,8 @@ const Login = () => {
 
         if (data.type === "subject-officer") {
           history(`/subject-officer-dashboard/${data.username}`);
+        } else if (data.type === "manager") {
+          history(`/manager-dashboard/${data.username}`);
         } else {
           history(`/user-dashboard/${data.username}`);
         }
