@@ -254,7 +254,7 @@ const Dashboard = () => {
                 Password Reset Request
               </Menu.Item>
             </>
-          ) : (
+          ) : localStorage.getItem("type") === "user" ? (
             <>
               <Menu.Item
                 key="0"
@@ -299,6 +299,8 @@ const Dashboard = () => {
                 Profile
               </Menu.Item>
             </>
+          ) : (
+            <></>
           )}
         </Menu>
         <br />
