@@ -18,10 +18,11 @@ import { LoginOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import PasswordResetRequest from "../Dashboard/DashboardSubComponents/PasswordResetRequest";
+import jwtDecode from "jwt-decode";
 
 const { Header } = Layout;
 
-const Login = () => {
+const Login = ({ setIsTokenReceived }) => {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
@@ -50,26 +51,26 @@ const Login = () => {
         config
       );
 
-      localStorage.setItem("authToken", data.token); //set the browser caching or local storage for globally accessed anywhere in the application
-      localStorage.setItem("username", data.username);
-      localStorage.setItem("email", data.email);
+      localStorage.setItem("authToken", data?.token); //set the browser caching or local storage for globally accessed anywhere in the application
+      localStorage.setItem("username", data?.username);
+      localStorage.setItem("email", data?.email);
       localStorage.setItem("type", data?.type);
       localStorage.setItem("id", data?.empId);
       localStorage.setItem("initials", data?.nameWithInitials);
 
       setTimeout(() => {
         // set a 5seconds timeout for authentication
-
-        if (data.type === "subject-officer") {
-          history(`/subject-officer-dashboard/${data.username}`);
-        } else if (data.type === "manager") {
-          history(`/manager-dashboard/${data.username}`);
+        setIsTokenReceived(true);
+        if (jwtDecode(data?.token).type === "subject-officer") {
+          history(`/subject-officer-dashboard/${data?.username}`);
+        } else if (jwtDecode(data?.token).type === "manager") {
+          history(`/manager-dashboard/${jwtDecode(data?.token).username}`);
         } else {
-          history(`/user-dashboard/${data.username}`);
+          history(`/user-dashboard/${jwtDecode(data?.token).username}`);
         }
 
         setLoading(false);
-        window.location.reload();
+        // window.location.reload();
       }, 5000);
     } catch (error) {
       setError(error.response.data.error);
@@ -115,7 +116,7 @@ const Login = () => {
         <Row>
           <Col className="left-side" xl={15} lg={15} md={24} sm={24}>
             <div className="left-side-inner-wrap">
-              <div className="title">Leave Management System</div>
+              <div className="title">Human Resource Management System</div>
               <center>
                 {error && (
                   <span style={{ color: "white", background: "orange" }}>

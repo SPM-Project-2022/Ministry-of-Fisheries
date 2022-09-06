@@ -9,7 +9,7 @@ function PrivateRoute({ children }) {
     setTimeout(() => setLoading(false), 5000);
   }, []);
 
-  if (localStorage.getItem("authToken") === "null") {
+  if (localStorage.getItem("authToken") == null) {
     return (
       <>
         {loading ? (
