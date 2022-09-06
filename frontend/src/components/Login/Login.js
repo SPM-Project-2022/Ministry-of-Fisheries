@@ -168,29 +168,15 @@ const Login = ({ setIsTokenReceived }) => {
                         Something went wrong. Please try again later.
                       </small>
                     )}
-                    {loading ? (
-                      <Button
-                        label={"SUBMIT"}
-                        className="submit-btn"
-                        htmlType="submit"
-                        type={"primary"}
-                        disabled={loading}
-                        icon={<Spin />}
-                      >
-                        &nbsp;Authenticating...
-                      </Button>
-                    ) : (
-                      <Button
-                        label={"SUBMIT"}
-                        className="submit-btn"
-                        htmlType="submit"
-                        type={"primary"}
-                        icon={<LoginOutlined />}
-                        disabled={loading}
-                      >
-                        SUBMIT
-                      </Button>
-                    )}
+                    <Button
+                      className="submit-btn"
+                      htmlType="submit"
+                      type={"primary"}
+                      disabled={loading}
+                      loading={loading}
+                    >
+                      SUBMIT
+                    </Button>
                   </center>
                 </div>
               </Form>
