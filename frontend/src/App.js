@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import Dashboard from "./componets/Dashboard/Dashboard";
+import Dashboard from "./components/Dashboard/Dashboard";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from "./componets/Login/Login";
+import Login from "./components/Login/Login";
 import PrivateRoute from "./routes/PrivateRoute";
 import PageNotFound from "./routes/PageNotFound";
-import ResetPassword from "./componets/Dashboard/DashboardSubComponents/ResetPassword";
+import ResetPassword from "./components/Dashboard/DashboardSubComponents/ResetPassword";
 import jwtDecode from "jwt-decode";
 import ErrorBoundary from "./errorBoundary";
 
