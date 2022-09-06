@@ -2,7 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const path = require("path")
+const path = require("path");
 
 dotenv.config();
 
@@ -33,15 +33,16 @@ app.listen(PORT, () => {
 
 app.use("/api/auth", require("./BACKEND/routes/auth"));
 app.use("/ministry", require("./BACKEND/routes/leave"));
+app.use("/salary", require("./BACKEND/routes/attendance"));
 
-if(process.env.NODE_ENV === "production"){
+if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/frontend/build")));
 
-  app.get("*" , (req , res)=>{
-      res.sendFile(path.join(__dirname , "frontend" , "build" , "index.html"));
-  })
-}else{
-  app.get("/" , (req ,res)=>{
-      res.send("Api Running");
-  })
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "frontend", "build", "index.html"));
+  });
+} else {
+  app.get("/", (req, res) => {
+    res.send("Api Running");
+  });
 }

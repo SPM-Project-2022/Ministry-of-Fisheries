@@ -34,7 +34,7 @@ const { Header, Content, Footer, Sider } = Layout;
 
 const Dashboard = ({ user }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const [dashboard, setDashboard] = useState("dashboard");
+  const [dashboard, setDashboard] = useState(null);
   const history = useNavigate();
   const location = useLocation();
   const search = window.location.search;
@@ -124,22 +124,21 @@ const Dashboard = ({ user }) => {
         case "Admin":
           if (queryL === "leave") return <DisplayLeaves />;
           else if (queryApply === "true") return <LeaveRequest />;
-          return _displayWarning();
+          else if (dashboard) return _displayWarning();
         case "subject-officer":
           if (queryE === "employee") return <DisplayEmployees />;
           else if (queryA === "add") return <AddEmployee />;
           else if (queryH === "history") return <LeaveHistory />;
           else if (queryR === "request") return <PasswordResetRequest />;
           else if (queryEdit === "true") return <EditEmployee />;
-          return _displayWarning();
+          else if (dashboard) return _displayWarning();
         case "manager":
           if (queryCalcSal == 1) return <CalculateSalary />;
-          return _displayWarning();
-        case "user":
+          else if (dashboard) return _displayWarning();
           if (queryProfile === "my") return <Profile />;
           else if (queryUEdit === "true") return <EditEmployee />;
           else if (queryMy === "view") return <Leaves />;
-          return _displayWarning();
+          else if (dashboard) return _displayWarning();
         default:
           return <></>;
       }
