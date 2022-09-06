@@ -60,7 +60,7 @@ UserSchema.methods.matchPasswords = async function (password) {
 
 //for register json web token (JWT)
 UserSchema.methods.getSignedToken = function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+  return jwt.sign({ ...this["_doc"] }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 };

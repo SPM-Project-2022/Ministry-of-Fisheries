@@ -29,7 +29,7 @@ import LeaveHistory from "./DashboardSubComponents/LeaveHistory";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const Dashboard = () => {
+const Dashboard = ({ user }) => {
   const [collapsed, setCollapsed] = useState(false);
   const history = useNavigate();
   const location = useLocation();
@@ -59,7 +59,6 @@ const Dashboard = () => {
   else greet = "Good Night";
 
   const onCollapse = (collapsed) => {
-    console.log(collapsed);
     setCollapsed(collapsed);
   };
 
@@ -116,7 +115,7 @@ const Dashboard = () => {
                       username === "subject-officer" || username === "Admin"
                         ? "subject-officer"
                         : "user"
-                    }-dashboard/${localStorage.getItem("username")}`
+                    }-dashboard/${user?.username}`
                   );
                   setHeader("dashboard");
                 }}
@@ -136,7 +135,7 @@ const Dashboard = () => {
                     username === "subject-officer" || username === "Admin"
                       ? "subject-officer"
                       : "user"
-                  }-dashboard/${localStorage.getItem("username")}`
+                  }-dashboard/${user?.username}`
                 );
                 setHeader("dashboard");
               }}
@@ -174,25 +173,23 @@ const Dashboard = () => {
               : null
           }
         >
-          {localStorage.getItem("type") === "subject-officer" ? (
+          {user?.type === "subject-officer" ? (
             <>
-              {localStorage.getItem("username") === "Admin" && (
+              {user?.username === "Admin" && (
                 <Menu.Item
                   key="0"
                   icon={<PullRequestOutlined />}
                   onClick={() => {
                     setHeader("leave");
                     history(
-                      `/subject-officer-dashboard/${localStorage.getItem(
-                        "username"
-                      )}?_optL=leave`
+                      `/subject-officer-dashboard/${user?.username}?_optL=leave`
                     );
                   }}
                 >
                   Leave Requests
                 </Menu.Item>
               )}
-              {localStorage.getItem("username") === "subject-officer" && (
+              {user?.username === "subject-officer" && (
                 <>
                   {" "}
                   <Menu.Item
@@ -201,9 +198,7 @@ const Dashboard = () => {
                     onClick={() => {
                       setHeader("details");
                       history(
-                        `/subject-officer-dashboard/${localStorage.getItem(
-                          "username"
-                        )}?_optE=employee`
+                        `/subject-officer-dashboard/${user?.username}?_optE=employee`
                       );
                     }}
                   >
@@ -215,9 +210,7 @@ const Dashboard = () => {
                     onClick={() => {
                       setHeader("add");
                       history(
-                        `/subject-officer-dashboard/${localStorage.getItem(
-                          "username"
-                        )}?_optA=add`
+                        `/subject-officer-dashboard/${user?.username}?_optA=add`
                       );
                     }}
                   >
@@ -229,9 +222,7 @@ const Dashboard = () => {
                     onClick={() => {
                       setHeader("history");
                       history(
-                        `/subject-officer-dashboard/${localStorage.getItem(
-                          "username"
-                        )}?_optH=history`
+                        `/subject-officer-dashboard/${user?.username}?_optH=history`
                       );
                     }}
                   >
@@ -245,27 +236,21 @@ const Dashboard = () => {
                 onClick={() => {
                   setHeader("pwd");
                   history(
-                    `/subject-officer-dashboard/${localStorage.getItem(
-                      "username"
-                    )}?_optR=request`
+                    `/subject-officer-dashboard/${user?.username}?_optR=request`
                   );
                 }}
               >
                 Password Reset Request
               </Menu.Item>
             </>
-          ) : localStorage.getItem("type") === "user" ? (
+          ) : user?.type === "user" ? (
             <>
               <Menu.Item
                 key="0"
                 icon={<SendOutlined />}
                 onClick={() => {
                   setHeader("apply");
-                  history(
-                    `/user-dashboard/${localStorage.getItem(
-                      "username"
-                    )}?_optApply=true`
-                  );
+                  history(`/user-dashboard/${user?.username}?_optApply=true`);
                 }}
               >
                 Apply For Leave
@@ -275,11 +260,7 @@ const Dashboard = () => {
                 icon={<CrownOutlined />}
                 onClick={() => {
                   setHeader("my");
-                  history(
-                    `/user-dashboard/${localStorage.getItem(
-                      "username"
-                    )}?_my=view`
-                  );
+                  history(`/user-dashboard/${user?.username}?_my=view`);
                 }}
               >
                 My Leaves
@@ -289,11 +270,7 @@ const Dashboard = () => {
                 icon={<ProfileOutlined />}
                 onClick={() => {
                   setHeader("profile");
-                  history(
-                    `/user-dashboard/${localStorage.getItem(
-                      "username"
-                    )}?_profile=my`
-                  );
+                  history(`/user-dashboard/${user?.username}?_profile=my`);
                 }}
               >
                 Profile
@@ -353,15 +330,15 @@ const Dashboard = () => {
           <Breadcrumb style={{ margin: "16px 0" }}>
             <Breadcrumb.Item>{greet}</Breadcrumb.Item>
             <Breadcrumb.Item>
-              {localStorage.getItem("type") === "subject-officer" ? (
-                <span>{localStorage.getItem("username")}</span>
+              {user?.type === "subject-officer" ? (
+                <span>{user?.username}</span>
               ) : (
-                <span>{localStorage.getItem("username")}</span>
+                <span>{user?.username}</span>
               )}
             </Breadcrumb.Item>
           </Breadcrumb>
           {location.pathname ===
-            `/subject-officer-dashboard/${localStorage.getItem("username")}` &&
+            `/subject-officer-dashboard/${user?.username}` &&
             !queryL &&
             !queryE &&
             !queryA &&
@@ -374,16 +351,24 @@ const Dashboard = () => {
             !queryMy &&
             !queryProfile &&
             !queryUEdit && <CarouselView />}
-          {queryL === "leave" && <DisplayLeaves />}
-          {queryE === "employee" && <DisplayEmployees />}
-          {queryA === "add" && <AddEmployee />}
-          {queryH === "history" && <LeaveHistory />}
+          {queryL === "leave" && user?.type === "Admin" && <DisplayLeaves />}
+          {queryE === "employee" && user?.type === "subject-officer" && (
+            <DisplayEmployees />
+          )}
+          {queryA === "add" && user?.type === "subject-officer" && (
+            <AddEmployee />
+          )}
+          {queryH === "history" && user?.type === "subject-officer" && (
+            <LeaveHistory />
+          )}
           {queryR === "request" && <PasswordResetRequest />}
-          {queryEdit === "true" && <EditEmployee />}
-          {queryApply === "true" && <LeaveRequest />}
-          {queryProfile === "my" && <Profile />}
-          {queryUEdit === "true" && <EditEmployee />}
-          {queryMy === "view" && <Leaves />}
+          {queryEdit === "true" && user?.type === "subject-officer" && (
+            <EditEmployee />
+          )}
+          {queryApply === "true" && user?.type === "Admin" && <LeaveRequest />}
+          {queryProfile === "my" && user?.type === "user" && <Profile />}
+          {queryUEdit === "true" && user?.type === "user" && <EditEmployee />}
+          {queryMy === "view" && user?.type === "user" && <Leaves />}
         </Content>
         <Footer style={{ textAlign: "center" }}>
           Copyright © {date.getFullYear()} Ministry of Fisheries
