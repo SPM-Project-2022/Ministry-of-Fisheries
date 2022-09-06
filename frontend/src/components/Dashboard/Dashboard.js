@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Layout, Menu, Breadcrumb, Button } from "antd";
+import { Layout, Menu, Breadcrumb, Button, Empty } from "antd";
 import {
   UserAddOutlined,
   PullRequestOutlined,
@@ -11,6 +11,8 @@ import {
   CrownOutlined,
   ProfileOutlined,
   HomeOutlined,
+  CalculatorOutlined,
+  WarningOutlined,
 } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import "./styles/Dashboard.css";
@@ -26,11 +28,13 @@ import LeaveRequest from "./DashboardSubComponents/LeaveRequest";
 import Profile from "./DashboardSubComponents/Profile";
 import Leaves from "./DashboardSubComponents/Leaves";
 import LeaveHistory from "./DashboardSubComponents/LeaveHistory";
+import CalculateSalary from "./DashboardSubComponents/manager/CalculateSalary";
 
 const { Header, Content, Footer, Sider } = Layout;
 
 const Dashboard = ({ user }) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [dashboard, setDashboard] = useState("dashboard");
   const history = useNavigate();
   const location = useLocation();
   const search = window.location.search;
@@ -45,6 +49,7 @@ const Dashboard = ({ user }) => {
   const queryMy = params.get("_my");
   const queryProfile = params.get("_profile");
   const queryUEdit = params.get("_userEdit");
+  const queryCalcSal = params.get("_calcSal");
 
   const { username } = useParams();
 
@@ -63,6 +68,7 @@ const Dashboard = ({ user }) => {
   };
 
   const setHeader = (type) => {
+    setDashboard(type);
     switch (type) {
       case "dashboard":
         document.getElementById("header").innerHTML = "Dashboard";
@@ -88,6 +94,10 @@ const Dashboard = ({ user }) => {
       case "profile":
         document.getElementById("header").innerHTML = "My Profile";
         break;
+      case "calc_salary":
+        document.getElementById("header").innerHTML = "Calculate Salary";
+        break;
+
       default:
         break;
     }
@@ -99,6 +109,41 @@ const Dashboard = ({ user }) => {
     localStorage.removeItem("email");
     localStorage.removeItem("type");
     history("/");
+  };
+
+  const _displayWarning = () => (
+    <Empty
+      image={"https://i.ibb.co/r3jR052/warn.png"}
+      description={"We are sorry. You are not authorized for this route"}
+    />
+  );
+
+  const _getPermissionRoutes = () => {
+    if (dashboard !== "dashboard") {
+      switch (user?.type) {
+        case "Admin":
+          if (queryL === "leave") return <DisplayLeaves />;
+          else if (queryApply === "true") return <LeaveRequest />;
+          return _displayWarning();
+        case "subject-officer":
+          if (queryE === "employee") return <DisplayEmployees />;
+          else if (queryA === "add") return <AddEmployee />;
+          else if (queryH === "history") return <LeaveHistory />;
+          else if (queryR === "request") return <PasswordResetRequest />;
+          else if (queryEdit === "true") return <EditEmployee />;
+          return _displayWarning();
+        case "manager":
+          if (queryCalcSal == 1) return <CalculateSalary />;
+          return _displayWarning();
+        case "user":
+          if (queryProfile === "my") return <Profile />;
+          else if (queryUEdit === "true") return <EditEmployee />;
+          else if (queryMy === "view") return <Leaves />;
+          return _displayWarning();
+        default:
+          return <></>;
+      }
+    }
   };
 
   return (
@@ -114,6 +159,8 @@ const Dashboard = ({ user }) => {
                     `/${
                       username === "subject-officer" || username === "Admin"
                         ? "subject-officer"
+                        : username === "Manager"
+                        ? "manager"
                         : "user"
                     }-dashboard/${user?.username}`
                   );
@@ -134,6 +181,8 @@ const Dashboard = ({ user }) => {
                   `/${
                     username === "subject-officer" || username === "Admin"
                       ? "subject-officer"
+                      : username === "Manager"
+                      ? "manager"
                       : "user"
                   }-dashboard/${user?.username}`
                 );
@@ -156,7 +205,7 @@ const Dashboard = ({ user }) => {
           theme="dark"
           mode="inline"
           selectedKeys={
-            queryL === "leave" || queryApply === "true"
+            queryL === "leave" || queryApply === "true" || queryCalcSal == 1
               ? ["0"]
               : queryE === "employee" ||
                 queryEdit === "true" ||
@@ -277,7 +326,18 @@ const Dashboard = ({ user }) => {
               </Menu.Item>
             </>
           ) : (
-            <></>
+            <>
+              <Menu.Item
+                key={"0"}
+                icon={<CalculatorOutlined />}
+                onClick={() => {
+                  setHeader("calc_salary");
+                  history(`/manager-dashboard/${user?.username}?_calcSal=1`);
+                }}
+              >
+                Calculate Salary
+              </Menu.Item>
+            </>
           )}
         </Menu>
         <br />
@@ -323,19 +383,15 @@ const Dashboard = ({ user }) => {
               ? "My Profile"
               : queryUEdit === "true"
               ? "Edit Your Profile"
+              : queryCalcSal == 1
+              ? "Calculate Salary"
               : "Dashboard"}
           </h1>
         </Header>
         <Content style={{ margin: "0 16px" }}>
           <Breadcrumb style={{ margin: "16px 0" }}>
             <Breadcrumb.Item>{greet}</Breadcrumb.Item>
-            <Breadcrumb.Item>
-              {user?.type === "subject-officer" ? (
-                <span>{user?.username}</span>
-              ) : (
-                <span>{user?.username}</span>
-              )}
-            </Breadcrumb.Item>
+            <Breadcrumb.Item>{user?.fullName}</Breadcrumb.Item>
           </Breadcrumb>
           {location.pathname ===
             `/subject-officer-dashboard/${user?.username}` &&
@@ -350,25 +406,9 @@ const Dashboard = ({ user }) => {
             !queryApply &&
             !queryMy &&
             !queryProfile &&
-            !queryUEdit && <CarouselView />}
-          {queryL === "leave" && user?.type === "Admin" && <DisplayLeaves />}
-          {queryE === "employee" && user?.type === "subject-officer" && (
-            <DisplayEmployees />
-          )}
-          {queryA === "add" && user?.type === "subject-officer" && (
-            <AddEmployee />
-          )}
-          {queryH === "history" && user?.type === "subject-officer" && (
-            <LeaveHistory />
-          )}
-          {queryR === "request" && <PasswordResetRequest />}
-          {queryEdit === "true" && user?.type === "subject-officer" && (
-            <EditEmployee />
-          )}
-          {queryApply === "true" && user?.type === "Admin" && <LeaveRequest />}
-          {queryProfile === "my" && user?.type === "user" && <Profile />}
-          {queryUEdit === "true" && user?.type === "user" && <EditEmployee />}
-          {queryMy === "view" && user?.type === "user" && <Leaves />}
+            !queryUEdit &&
+            !queryCalcSal && <CarouselView />}
+          {_getPermissionRoutes()}
         </Content>
         <Footer style={{ textAlign: "center" }}>
           Copyright © {date.getFullYear()} Ministry of Fisheries
