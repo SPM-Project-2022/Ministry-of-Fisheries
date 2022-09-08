@@ -24,8 +24,21 @@ router.route("/create").post(async (req, res) => {
     await newUnofficialEmployee
       .save()
       .then(() =>
-        res.status(200).json({ success: true, message: "Successfully Saved" })
+        res.status(200).json({ success: true, message: "Successfully UnofficialEmployee Added" })
       )
+      .catch((err) => res.status(500).json({ success: false, err }));
+  });
+
+  router.route("/").get(async (req, res) => {
+    await UnofficialEmployee.find()
+      .then((unofficialEmployee) => res.json(unofficialEmployee))
+      .catch((err) => res.status(500).json({ success: false, err }));
+  });
+  
+  router.route("/get/:id").get(async (req, res) => {
+    const { id } = req.params;
+    await UnofficialEmployee.findById(id)
+      .then((unofficialEmployee) => res.json(unofficialEmployee))
       .catch((err) => res.status(500).json({ success: false, err }));
   });
 
