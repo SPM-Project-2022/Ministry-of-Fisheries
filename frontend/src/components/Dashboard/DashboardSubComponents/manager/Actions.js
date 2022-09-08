@@ -7,6 +7,7 @@ import {
   Empty,
   Spin,
   Switch,
+  Input,
 } from "antd";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -17,6 +18,7 @@ const Actions = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toggle, setToggle] = useState(false);
+  const initialValues = { amount: null, finalPayment: null };
 
   const [form] = Form.useForm();
   const search = window.location.search;
@@ -39,7 +41,7 @@ const Actions = () => {
 
   const setHeader = (value) => (
     <>
-      {value?.fullName} &nbsp;
+      <span style={{ fontWeight: "bold" }}>{value?.fullName}</span> &nbsp;
       <i style={{ color: "green" }}> {value?.email}</i>
     </>
   );
@@ -50,6 +52,23 @@ const Actions = () => {
     setToggle(checked);
     setLoading(true);
   };
+
+  const setFinalPayment = (e, index, val) => {
+    form.setFieldsValue({
+      [index]: {
+        ...initialValues,
+        amount: e,
+        finalPayment: parseInt(e) + parseInt(val?.extra),
+      },
+    });
+    console.log("e", e);
+    console.log("index", index);
+    console.log("val", val);
+    console.log("form", form.getFieldsValue());
+    // form.setFieldsValue(parseInt(e));
+  };
+
+  console.log("form", form.getFieldsValue());
 
   return (
     <>
@@ -93,7 +112,63 @@ const Actions = () => {
               header={setHeader(value)}
               key={index + 1}
               extra={genExtra(value?.status)}
-            ></Panel>
+            >
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <div>
+                  <span>No of Days Worked : {value?.workedDays}</span>
+                  <br />
+                  <span>
+                    Eligibility :{" "}
+                    {value?.workedDays >= 20 ? (
+                      <span style={{ color: "green" }}>ELIGIBLE</span>
+                    ) : (
+                      <span style={{ color: "red" }}>NOT ELIGIBLE</span>
+                    )}
+                  </span>
+                  <br />
+                  <span
+                    style={{
+                      fontSize: "10px",
+                      fontWeight: "bold",
+                      color: "red",
+                    }}
+                  >
+                    (Employees should be worked at least 20days)
+                  </span>
+                  <br />
+                  <span>Designation : {value?.designation}</span>
+                  <br />
+                  <span>
+                    Extra Fees :{" "}
+                    {value?.workedDays >= 20 ? (
+                      <span style={{ color: "green" }}>APPLICABLE</span>
+                    ) : (
+                      <span style={{ color: "red" }}>NOT APPLICABLE</span>
+                    )}
+                  </span>
+                  <br />
+                  <span>Extra Amount : Rs.{value?.extra}</span>
+                </div>
+
+                <Form form={form} initialValues={initialValues}>
+                  <Form.Item name={[index, "amount"]}>
+                    Amount(Rs.) :{" "}
+                    <Input
+                      placeholder="Enter amount"
+                      disabled={!(value?.workedDays >= 20)}
+                      type={"number"}
+                      onChange={(e) =>
+                        setFinalPayment(e.target.value, index, value)
+                      }
+                    />
+                  </Form.Item>
+                  {console.log(form.getFieldsValue(),"test")}
+                  {/* <Form.Item name={[index, "finalPayment"]}>
+                    Final Payment(Rs.) : <Input value={form.getFieldsValue()} disabled type={"number"} />
+                  </Form.Item> */}
+                </Form>
+              </div>
+            </Panel>
           ))
         )}
       </Collapse>
