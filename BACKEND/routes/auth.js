@@ -10,8 +10,8 @@ const {
   getById,
   updateById,
   deleteById,
-  notifyUser
 } = require("../controllers/auth");
+const { notifyUser } = require("../utils/notifyUser");
 
 //bellow routes map the controllers
 router.route("/register").post(register); // call the auth in controllers

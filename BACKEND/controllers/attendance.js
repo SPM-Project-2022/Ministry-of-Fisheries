@@ -1,7 +1,16 @@
 const Attendance = require("../models/attendance");
 
 exports.markAttendance = async (req, res) => {
-  const { fullName, email, designation, extra, status = "PENDING" } = req.body;
+  const {
+    fullName,
+    email,
+    designation,
+    extra,
+    status = "PENDING",
+    amount = null,
+    finalPayment = null,
+    nic,
+  } = req.body;
   const workedDays = Number(req.body.workedDays);
 
   await Attendance.create({
@@ -11,6 +20,9 @@ exports.markAttendance = async (req, res) => {
     designation,
     extra,
     status,
+    amount,
+    finalPayment,
+    nic,
   })
     .then(() =>
       res
@@ -41,8 +53,14 @@ exports.updateAttendance = async (req, res) => {
 
 exports.updateByStatus = async (req, res) => {
   const { id } = req.params;
+  const { amount, finalPayment, date } = req.body;
 
-  await Attendance.findByIdAndUpdate(id, { status: "PAID" })
+  await Attendance.findByIdAndUpdate(id, {
+    status: "PAID",
+    amount,
+    finalPayment,
+    date,
+  })
     .then(() =>
       res.status(200).json({ success: true, message: "Status Updated" })
     )

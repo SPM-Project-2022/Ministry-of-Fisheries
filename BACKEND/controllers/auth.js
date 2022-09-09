@@ -268,38 +268,6 @@ exports.deleteById = async (req, res) => {
     .catch((err) => res.status(500).json({ success: false, err }));
 };
 
-exports.notifyUser = async (req, res) => {
-  const { username, email, password } = req.body;
-
-  const message = `
-        <center>
-        <img src='https://i.ibb.co/2MbfFCT/logo.png' />
-        <h1>Ministry of Fisheries</h1><br/><br/></br>
-        <h3>We created a login for you</h3>
-        <p>Please refer the bellow credentials to login to the system</p>
-        <p>Username : ${username}</p>
-        <p>Password : ${password}</p>
-        <br/><br/></br>
-        <span>Copyright © 2022 Ministry of Fisheries<span></center>
-         `;
-  try {
-    await sendEmail({
-      //send email
-      to: email,
-      subject: "Login Details For Ministry Of Fisheries",
-      text: message,
-    });
-
-    res
-      .status(200)
-      .json({ success: true, verify: "Email is sent to the user" });
-  } catch (error) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Email could not be sent" });
-  }
-};
-
 const sendToken = (user, statusCode, res) => {
   //JWT get
   const token = user.getSignedToken();

@@ -34,6 +34,7 @@ app.listen(PORT, () => {
 app.use("/api/auth", require("./BACKEND/routes/auth"));
 app.use("/ministry", require("./BACKEND/routes/leave"));
 app.use("/salary", require("./BACKEND/routes/attendance"));
+app.use("/master-table", require("./BACKEND/routes/masterSalaryTable"));
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/frontend/build")));
