@@ -12,14 +12,10 @@ import ErrorBoundary from "./errorBoundary";
 const App = () => {
   // The back-to-top button is hidden at the beginning
   const [showButton, setShowButton] = useState(false);
-  const [decodedToken, setDecodedToken] = useState(null);
+  const decodedToken = jwtDecode(localStorage.getItem("authToken"));
   const [isTokenReceived, setIsTokenReceived] = useState(null);
 
   useEffect(() => {
-    (async () => {
-      if (localStorage.getItem("authToken") != null)
-        setDecodedToken(await jwtDecode(localStorage.getItem("authToken")));
-    })();
     window.addEventListener("scroll", () => {
       if (window.pageYOffset > 100) {
         setShowButton(true);

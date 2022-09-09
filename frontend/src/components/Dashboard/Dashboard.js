@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Layout, Menu, Breadcrumb, Button, Empty } from "antd";
 import {
   UserAddOutlined,
@@ -32,9 +32,10 @@ import CalculateSalary from "./DashboardSubComponents/manager/CalculateSalary";
 
 const { Header, Content, Footer, Sider } = Layout;
 
-const Dashboard = ({ user }) => {
+const Dashboard = ({ user = null }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [dashboard, setDashboard] = useState(null);
+  const loggedUser = { ...user };
   const history = useNavigate();
   const location = useLocation();
   const search = window.location.search;
@@ -120,9 +121,9 @@ const Dashboard = ({ user }) => {
 
   const _getPermissionRoutes = () => {
     if (dashboard !== "dashboard") {
-      switch (user?.type) {
+      switch (loggedUser?.type) {
         case "subject-officer":
-          if (user?.username === "Admin") {
+          if (loggedUser?.username === "Admin") {
             if (queryL === "leave") return <DisplayLeaves />;
             else if (queryApply === "true") return <LeaveRequest />;
             else if (queryR === "request") return <PasswordResetRequest />;
@@ -161,7 +162,7 @@ const Dashboard = ({ user }) => {
                         : username === "Manager"
                         ? "manager"
                         : "user"
-                    }-dashboard/${user?.username}`
+                    }-dashboard/${loggedUser?.username}`
                   );
                   setHeader("dashboard");
                 }}
@@ -183,7 +184,7 @@ const Dashboard = ({ user }) => {
                       : username === "Manager"
                       ? "manager"
                       : "user"
-                  }-dashboard/${user?.username}`
+                  }-dashboard/${loggedUser?.username}`
                 );
                 setHeader("dashboard");
               }}
@@ -221,23 +222,23 @@ const Dashboard = ({ user }) => {
               : null
           }
         >
-          {user?.type === "subject-officer" ? (
+          {loggedUser?.type === "subject-officer" ? (
             <>
-              {user?.username === "Admin" && (
+              {loggedUser?.username === "Admin" && (
                 <Menu.Item
                   key="0"
                   icon={<PullRequestOutlined />}
                   onClick={() => {
                     setHeader("leave");
                     history(
-                      `/subject-officer-dashboard/${user?.username}?_optL=leave`
+                      `/subject-officer-dashboard/${loggedUser?.username}?_optL=leave`
                     );
                   }}
                 >
                   Leave Requests
                 </Menu.Item>
               )}
-              {user?.username === "subject-officer" && (
+              {loggedUser?.username === "subject-officer" && (
                 <>
                   {" "}
                   <Menu.Item
@@ -246,7 +247,7 @@ const Dashboard = ({ user }) => {
                     onClick={() => {
                       setHeader("details");
                       history(
-                        `/subject-officer-dashboard/${user?.username}?_optE=employee`
+                        `/subject-officer-dashboard/${loggedUser?.username}?_optE=employee`
                       );
                     }}
                   >
@@ -258,7 +259,7 @@ const Dashboard = ({ user }) => {
                     onClick={() => {
                       setHeader("add");
                       history(
-                        `/subject-officer-dashboard/${user?.username}?_optA=add`
+                        `/subject-officer-dashboard/${loggedUser?.username}?_optA=add`
                       );
                     }}
                   >
@@ -270,7 +271,7 @@ const Dashboard = ({ user }) => {
                     onClick={() => {
                       setHeader("history");
                       history(
-                        `/subject-officer-dashboard/${user?.username}?_optH=history`
+                        `/subject-officer-dashboard/${loggedUser?.username}?_optH=history`
                       );
                     }}
                   >
@@ -284,21 +285,23 @@ const Dashboard = ({ user }) => {
                 onClick={() => {
                   setHeader("pwd");
                   history(
-                    `/subject-officer-dashboard/${user?.username}?_optR=request`
+                    `/subject-officer-dashboard/${loggedUser?.username}?_optR=request`
                   );
                 }}
               >
                 Password Reset Request
               </Menu.Item>
             </>
-          ) : user?.type === "user" ? (
+          ) : loggedUser?.type === "user" ? (
             <>
               <Menu.Item
                 key="0"
                 icon={<SendOutlined />}
                 onClick={() => {
                   setHeader("apply");
-                  history(`/user-dashboard/${user?.username}?_optApply=true`);
+                  history(
+                    `/user-dashboard/${loggedUser?.username}?_optApply=true`
+                  );
                 }}
               >
                 Apply For Leave
@@ -308,7 +311,7 @@ const Dashboard = ({ user }) => {
                 icon={<CrownOutlined />}
                 onClick={() => {
                   setHeader("my");
-                  history(`/user-dashboard/${user?.username}?_my=view`);
+                  history(`/user-dashboard/${loggedUser?.username}?_my=view`);
                 }}
               >
                 My Leaves
@@ -318,7 +321,9 @@ const Dashboard = ({ user }) => {
                 icon={<ProfileOutlined />}
                 onClick={() => {
                   setHeader("profile");
-                  history(`/user-dashboard/${user?.username}?_profile=my`);
+                  history(
+                    `/user-dashboard/${loggedUser?.username}?_profile=my`
+                  );
                 }}
               >
                 Profile
@@ -331,7 +336,9 @@ const Dashboard = ({ user }) => {
                 icon={<CalculatorOutlined />}
                 onClick={() => {
                   setHeader("calc_salary");
-                  history(`/manager-dashboard/${user?.username}?_calcSal=1`);
+                  history(
+                    `/manager-dashboard/${loggedUser?.username}?_calcSal=1`
+                  );
                 }}
               >
                 Calculate Salary
@@ -390,10 +397,10 @@ const Dashboard = ({ user }) => {
         <Content style={{ margin: "0 16px" }}>
           <Breadcrumb style={{ margin: "16px 0" }}>
             <Breadcrumb.Item>{greet}</Breadcrumb.Item>
-            <Breadcrumb.Item>{user?.fullName}</Breadcrumb.Item>
+            <Breadcrumb.Item>{loggedUser?.fullName}</Breadcrumb.Item>
           </Breadcrumb>
           {location.pathname ===
-            `/subject-officer-dashboard/${user?.username}` &&
+            `/subject-officer-dashboard/${loggedUser?.username}` &&
             !queryL &&
             !queryE &&
             !queryA &&
