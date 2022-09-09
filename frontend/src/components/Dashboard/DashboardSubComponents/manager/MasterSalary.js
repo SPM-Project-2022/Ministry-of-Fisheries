@@ -18,11 +18,26 @@ const MasterSalary = () => {
       title: "ID",
       dataIndex: "id",
       render: (_, record) => <div>#{record?.id}</div>,
+      sorter: true,
+      sortDerection: ["acend", "decend"],
+      sorter: (a, b) => a.id > b.id,
     },
-    { title: "Designation", dataIndex: "designation" },
-    { title: "Salary(Rs.)", dataIndex: "salary" },
     {
-      title: "Sataus",
+      title: "Designation",
+      dataIndex: "designation",
+      sorter: true,
+      sortDerection: ["acend", "decend"],
+      sorter: (a, b) => a.designation.length - b.designation.length,
+    },
+    {
+      title: "Salary(Rs.)",
+      dataIndex: "salary",
+      sorter: true,
+      sortDerection: ["acend", "decend"],
+      sorter: (a, b) => a.salary > b.salary,
+    },
+    {
+      title: "Status",
       render: () => (
         <div>
           <DeleteOutlined className="icon-delete" />

@@ -215,7 +215,7 @@ const Actions = () => {
                 <Form form={form} onFinish={() => handleSubmit(value, index)}>
                   <Form.Item
                     name={[index, "amount"]}
-                    rules={[{ required: true, message: "Amount is required!" }]}
+                    // rules={[{ required: true, message: "Amount is required!" }]}
                   >
                     Amount(Rs.) : {value?.status === "PAID"}
                     <Input
