@@ -136,6 +136,7 @@ const Dashboard = ({ user = null }) => {
         case "manager":
           if (queryCalcSal == 1) return <CalculateSalary />;
           else if (dashboard) return _displayWarning();
+        case "user":
           if (queryProfile === "my") return <Profile />;
           else if (queryUEdit === "true") return <EditEmployee />;
           else if (queryMy === "view") return <Leaves />;
