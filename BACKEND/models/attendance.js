@@ -8,6 +8,9 @@ const Attendance = new Schema({
   workedDays: Number,
   extra: String,
   status: String,
+  amount: String,
+  finalPayment: String,
+  datePaid: Date,
 });
 
 module.exports = mongoose.model("attendance", Attendance);

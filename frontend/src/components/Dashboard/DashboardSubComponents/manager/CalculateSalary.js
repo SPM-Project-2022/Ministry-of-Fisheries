@@ -29,7 +29,7 @@ const CalculateSalary = () => {
         <TabPane
           tab={
             <>
-              <QuestionCircleFilled /> Evaluation History
+              <QuestionCircleFilled /> Payment History
             </>
           }
           key="history"

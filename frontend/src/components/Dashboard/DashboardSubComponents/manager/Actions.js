@@ -23,6 +23,8 @@ const Actions = () => {
     amount: null,
     finalPayment: null,
   });
+  const [submitted, setSubmitted] = useState(false);
+  let [amount, setAmount] = useState(null);
 
   const [form] = Form.useForm();
   const search = window.location.search;
@@ -30,12 +32,24 @@ const Actions = () => {
   useEffect(() => {
     (async () =>
       await axios.get("/salary").then((res) => {
-        if (toggle)
+        if (toggle) {
           setData(res?.data?.filter(({ status }) => status !== "PENDING"));
-        else setData(res?.data?.filter(({ status }) => status === "PENDING"));
+          setAmount(
+            res?.data
+              ?.filter(({ status }) => status !== "PENDING")
+              .map(({ amount }) => amount)
+          );
+        } else {
+          setData(res?.data?.filter(({ status }) => status === "PENDING"));
+          setAmount(
+            res?.data
+              ?.filter(({ status }) => status === "PENDING")
+              .map(({ amount }) => amount)
+          );
+        }
         setLoading(false);
       }))();
-  }, [search, toggle]);
+  }, [search, toggle, submitted]);
 
   const genExtra = (value) => (
     <span className={toggle ? "paid" : "pending"}>
@@ -50,7 +64,40 @@ const Actions = () => {
     </>
   );
 
-  const handleSubmit = async (value) => {};
+  const handleSubmit = async (value, index) => {
+    try {
+      await axios
+        .put(`/salary/status/${value?._id}`, {
+          amount: initialValues[index].amount,
+          finalPayment: initialValues[index].finalPayment,
+          datePaid: new Date(),
+        })
+        .then(
+          async () =>
+            await axios
+              .post("/salary/notify-user", {
+                email: value?.email,
+                type: "salary",
+              })
+              .then(() => {
+                notification.info({
+                  message: `Notification`,
+                  description:
+                    "Payment will be notified user through the email.",
+                  placement: "topRight",
+                });
+                setSubmitted(true);
+                setInitialValues({ amount: null, finalPayment: null });
+              })
+        );
+    } catch (error) {
+      notification.error({
+        message: "Something Went Wrong",
+        description: error,
+        placement: "topRight",
+      });
+    }
+  };
 
   const handleToggle = (checked) => {
     setToggle(checked);
@@ -66,6 +113,23 @@ const Actions = () => {
       },
     });
     setInitialValues(form.getFieldsValue());
+    amount[index] = e;
+  };
+
+  const disablePermission = (value, btn = false, index = 0) => {
+    if (btn) {
+      if (amount[index] === "null" || !amount[index]) return true;
+      return false;
+    } else if (value?.status === "PENDING") {
+      if (!(value?.workedDays >= 20)) return true;
+      return false;
+    }
+    return true;
+  };
+
+  const getFinalPaymentValue = (value, index) => {
+    if (value?.status === "PAID") return value?.finalPayment;
+    return initialValues[index]?.finalPayment;
   };
 
   return (
@@ -148,16 +212,20 @@ const Actions = () => {
                   <span>Extra Amount : Rs.{value?.extra}</span>
                 </div>
 
-                <Form form={form}>
-                  <Form.Item name={[index, "amount"]}>
-                    Amount(Rs.) :{" "}
+                <Form form={form} onFinish={() => handleSubmit(value, index)}>
+                  <Form.Item
+                    name={[index, "amount"]}
+                    rules={[{ required: true, message: "Amount is required!" }]}
+                  >
+                    Amount(Rs.) : {value?.status === "PAID"}
                     <Input
-                      placeholder="Enter amount"
-                      disabled={!(value?.workedDays >= 20)}
+                      placeholder={!disablePermission(value) && "Enter amount"}
+                      disabled={disablePermission(value)}
                       type={"number"}
                       onChange={(e) =>
                         setFinalPayment(e.target.value, index, value)
                       }
+                      value={amount[index]}
                     />
                   </Form.Item>
 
@@ -166,21 +234,23 @@ const Actions = () => {
                     <Input
                       disabled
                       type={"number"}
-                      value={initialValues[index]?.finalPayment}
+                      value={getFinalPaymentValue(value, index)}
                     />
                   </Form.Item>
                 </Form>
               </div>
-              <div className="btn-submit-div">
-                <Button
-                  disabled={!(value?.workedDays >= 20)}
-                  className="submit"
-                  type={"primary"}
-                  onSubmit
-                >
-                  SUBMIT
-                </Button>
-              </div>
+              {value?.status === "PENDING" && (
+                <div className="btn-submit-div">
+                  <Button
+                    disabled={disablePermission(value, true, index)}
+                    className="submit"
+                    type={"primary"}
+                    onClick={() => form.submit()}
+                  >
+                    SUBMIT
+                  </Button>
+                </div>
+              )}
             </Panel>
           ))
         )}

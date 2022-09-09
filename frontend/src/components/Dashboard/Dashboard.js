@@ -13,6 +13,7 @@ import {
   HomeOutlined,
   CalculatorOutlined,
   WarningOutlined,
+  TableOutlined,
 } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import "./styles/Dashboard.css";
@@ -29,6 +30,7 @@ import Profile from "./DashboardSubComponents/Profile";
 import Leaves from "./DashboardSubComponents/Leaves";
 import LeaveHistory from "./DashboardSubComponents/LeaveHistory";
 import CalculateSalary from "./DashboardSubComponents/manager/CalculateSalary";
+import MasterSalary from "./DashboardSubComponents/manager/MasterSalary";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -51,6 +53,7 @@ const Dashboard = ({ user = null }) => {
   const queryProfile = params.get("_profile");
   const queryUEdit = params.get("_userEdit");
   const queryCalcSal = params.get("_calcSal");
+  const queryMasterTable = params.get("_salTable");
 
   const { username } = useParams();
 
@@ -98,7 +101,9 @@ const Dashboard = ({ user = null }) => {
       case "calc_salary":
         document.getElementById("header").innerHTML = "Calculate Salary";
         break;
-
+      case "masterTable":
+        document.getElementById("header").innerHTML = "Master Salary Table";
+        break;
       default:
         break;
     }
@@ -134,6 +139,7 @@ const Dashboard = ({ user = null }) => {
           else if (dashboard) return _displayWarning();
         case "manager":
           if (queryCalcSal == 1) return <CalculateSalary />;
+          else if (queryMasterTable == 1) return <MasterSalary />;
           else if (dashboard) return _displayWarning();
         case "user":
           if (queryProfile === "my") return <Profile />;
@@ -210,7 +216,8 @@ const Dashboard = ({ user = null }) => {
               ? ["0"]
               : queryE === "employee" ||
                 queryEdit === "true" ||
-                queryMy === "view"
+                queryMy === "view" ||
+                queryMasterTable == 1
               ? ["1"]
               : queryA === "add" ||
                 queryProfile === "my" ||
@@ -344,6 +351,18 @@ const Dashboard = ({ user = null }) => {
               >
                 Calculate Salary
               </Menu.Item>
+              <Menu.Item
+                key={"1"}
+                icon={<TableOutlined />}
+                onClick={() => {
+                  setHeader("masterTable");
+                  history(
+                    `/manager-dashboard/${loggedUser?.username}?_salTable=1`
+                  );
+                }}
+              >
+                Master Salary Table
+              </Menu.Item>
             </>
           )}
         </Menu>
@@ -392,6 +411,8 @@ const Dashboard = ({ user = null }) => {
               ? "Edit Your Profile"
               : queryCalcSal == 1
               ? "Calculate Salary"
+              : queryMasterTable == 1
+              ? "Master Salary Table"
               : "Dashboard"}
           </h1>
         </Header>
@@ -414,7 +435,8 @@ const Dashboard = ({ user = null }) => {
             !queryMy &&
             !queryProfile &&
             !queryUEdit &&
-            !queryCalcSal && <CarouselView />}
+            !queryCalcSal &&
+            !queryMasterTable && <CarouselView />}
           {_getPermissionRoutes()}
         </Content>
         <Footer style={{ textAlign: "center" }}>
