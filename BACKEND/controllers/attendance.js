@@ -39,4 +39,12 @@ exports.updateAttendance = async (req, res) => {
     .catch((err) => res.status(500).json({ success: false, message: err }));
 };
 
-exports.updateByStatus = async (req, res) => {};
+exports.updateByStatus = async (req, res) => {
+  const { id } = req.params;
+
+  await Attendance.findByIdAndUpdate(id, { status: "PAID" })
+    .then(() =>
+      res.status(200).json({ success: true, message: "Status Updated" })
+    )
+    .catch((err) => res.status(500).json({ success: false, message: err }));
+};

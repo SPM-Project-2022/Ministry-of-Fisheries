@@ -133,3 +133,19 @@
 .paid a:hover {
   transform: translateZ(-25px) rotateX(-90deg);
 }
+
+.submit {
+  background-color: #f35050;
+  color: #fff;
+  border-radius: 10%;
+}
+
+.submit:hover {
+  background-color: #fff;
+  color: #f35050;
+}
+
+.btn-submit-div {
+  display: flex;
+  justify-content: center;
+}

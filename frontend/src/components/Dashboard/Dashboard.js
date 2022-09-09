@@ -125,7 +125,6 @@ const Dashboard = ({ user = null }) => {
         case "subject-officer":
           if (loggedUser?.username === "Admin") {
             if (queryL === "leave") return <DisplayLeaves />;
-            else if (queryApply === "true") return <LeaveRequest />;
             else if (queryR === "request") return <PasswordResetRequest />;
             else if (dashboard) return _displayWarning();
           } else if (queryE === "employee") return <DisplayEmployees />;
@@ -138,6 +137,7 @@ const Dashboard = ({ user = null }) => {
           else if (dashboard) return _displayWarning();
         case "user":
           if (queryProfile === "my") return <Profile />;
+          else if (queryApply === "true") return <LeaveRequest />;
           else if (queryUEdit === "true") return <EditEmployee />;
           else if (queryMy === "view") return <Leaves />;
           else if (dashboard) return _displayWarning();

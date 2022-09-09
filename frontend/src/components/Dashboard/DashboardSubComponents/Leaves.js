@@ -42,7 +42,7 @@ const Leaves = () => {
         setVisible(false);
         notification.info({
           message: `Notification`,
-          description: "Successfully Submitted the user details 😘",
+          description: "Successfully deleted the leave 😘",
           placement: "top",
         });
       }, 3000);

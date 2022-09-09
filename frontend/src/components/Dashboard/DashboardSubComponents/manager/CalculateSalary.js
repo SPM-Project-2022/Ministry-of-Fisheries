@@ -1,7 +1,7 @@
 import React from "react";
 import { Tabs } from "antd";
 import { QuestionCircleFilled, ToolFilled } from "@ant-design/icons";
-import "../../styles/TabContainer.css";
+import "../../styles/TabContainer.scss";
 import { useLocation, useNavigate } from "react-router-dom";
 import Actions from "./Actions";
 import PaymentHistory from "./PaymentHistory";
