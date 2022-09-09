@@ -8,6 +8,7 @@ import {
   Spin,
   Switch,
   Input,
+  Button,
 } from "antd";
 import { useEffect } from "react";
 import { useState } from "react";
@@ -18,7 +19,10 @@ const Actions = () => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toggle, setToggle] = useState(false);
-  const initialValues = { amount: null, finalPayment: null };
+  const [initialValues, setInitialValues] = useState({
+    amount: null,
+    finalPayment: null,
+  });
 
   const [form] = Form.useForm();
   const search = window.location.search;
@@ -61,14 +65,8 @@ const Actions = () => {
         finalPayment: parseInt(e) + parseInt(val?.extra),
       },
     });
-    console.log("e", e);
-    console.log("index", index);
-    console.log("val", val);
-    console.log("form", form.getFieldsValue());
-    // form.setFieldsValue(parseInt(e));
+    setInitialValues(form.getFieldsValue());
   };
-
-  console.log("form", form.getFieldsValue());
 
   return (
     <>
@@ -150,7 +148,7 @@ const Actions = () => {
                   <span>Extra Amount : Rs.{value?.extra}</span>
                 </div>
 
-                <Form form={form} initialValues={initialValues}>
+                <Form form={form}>
                   <Form.Item name={[index, "amount"]}>
                     Amount(Rs.) :{" "}
                     <Input
@@ -162,11 +160,26 @@ const Actions = () => {
                       }
                     />
                   </Form.Item>
-                  {console.log(form.getFieldsValue(),"test")}
-                  {/* <Form.Item name={[index, "finalPayment"]}>
-                    Final Payment(Rs.) : <Input value={form.getFieldsValue()} disabled type={"number"} />
-                  </Form.Item> */}
+
+                  <Form.Item name={[index, "finalPayment"]}>
+                    Final Payment(Rs.) :{" "}
+                    <Input
+                      disabled
+                      type={"number"}
+                      value={initialValues[index]?.finalPayment}
+                    />
+                  </Form.Item>
                 </Form>
+              </div>
+              <div className="btn-submit-div">
+                <Button
+                  disabled={!(value?.workedDays >= 20)}
+                  className="submit"
+                  type={"primary"}
+                  onSubmit
+                >
+                  SUBMIT
+                </Button>
               </div>
             </Panel>
           ))
