@@ -121,15 +121,15 @@ const Dashboard = ({ user }) => {
   const _getPermissionRoutes = () => {
     if (dashboard !== "dashboard") {
       switch (user?.type) {
-        case "Admin":
-          if (queryL === "leave") return <DisplayLeaves />;
-          else if (queryApply === "true") return <LeaveRequest />;
-          else if (dashboard) return _displayWarning();
         case "subject-officer":
-          if (queryE === "employee") return <DisplayEmployees />;
+          if (user?.username === "Admin") {
+            if (queryL === "leave") return <DisplayLeaves />;
+            else if (queryApply === "true") return <LeaveRequest />;
+            else if (queryR === "request") return <PasswordResetRequest />;
+            else if (dashboard) return _displayWarning();
+          } else if (queryE === "employee") return <DisplayEmployees />;
           else if (queryA === "add") return <AddEmployee />;
           else if (queryH === "history") return <LeaveHistory />;
-          else if (queryR === "request") return <PasswordResetRequest />;
           else if (queryEdit === "true") return <EditEmployee />;
           else if (dashboard) return _displayWarning();
         case "manager":
