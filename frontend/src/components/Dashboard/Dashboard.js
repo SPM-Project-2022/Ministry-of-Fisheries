@@ -31,6 +31,8 @@ import Leaves from "./DashboardSubComponents/Leaves";
 import LeaveHistory from "./DashboardSubComponents/LeaveHistory";
 import CalculateSalary from "./DashboardSubComponents/manager/CalculateSalary";
 import MasterSalary from "./DashboardSubComponents/manager/MasterSalary";
+import { useDispatch } from "react-redux";
+import { logout } from "../../redux/authActions";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -59,6 +61,8 @@ const Dashboard = ({ user = null }) => {
 
   const date = new Date();
   const hrs = date.getHours();
+
+  const dispatch = useDispatch();
 
   let greet;
 
@@ -110,10 +114,7 @@ const Dashboard = ({ user = null }) => {
   };
 
   const logoutHandler = () => {
-    localStorage.removeItem("username");
-    localStorage.setItem("authToken", null);
-    localStorage.removeItem("email");
-    localStorage.removeItem("type");
+    dispatch(logout());
     history("/");
   };
 

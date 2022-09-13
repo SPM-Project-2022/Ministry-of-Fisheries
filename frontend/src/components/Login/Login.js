@@ -1,41 +1,48 @@
-import React, { useState } from "react";
-import {
-  Row,
-  Col,
-  Form,
-  Input,
-  Button,
-  Layout,
-  Divider,
-  Checkbox,
-  Spin,
-} from "antd";
+import React, { useEffect, useState } from "react";
+import { Row, Col, Form, Input, Button, Layout, Divider, Checkbox } from "antd";
 import "./Login.scss";
 import Logo from "../Dashboard/assets/logo.png";
 import LoginLogo from "./assets/login.jpg";
-
-import { LoginOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import PasswordResetRequest from "../Dashboard/DashboardSubComponents/PasswordResetRequest";
 import jwtDecode from "jwt-decode";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "../../redux/authActions";
 
 const { Header } = Layout;
 
-const Login = ({ setIsTokenReceived }) => {
+const Login = () => {
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [available, setAvailable] = useState("");
-  const [loading, setLoading] = useState(false); //additional
   const [isError, setIsError] = useState(false);
 
   const history = useNavigate();
+  const dispatch = useDispatch();
+
+  const data = useSelector((state) => state?.auth?.login?.data?.data || null);
+  const loginSuccess = useSelector(
+    (state) => state?.auth?.login?.success?.status || false
+  );
+  const fetching = useSelector(
+    (state) => state?.auth?.login?.fetching || false
+  );
+
+  useEffect(() => {
+    if (loginSuccess) {
+      if (jwtDecode(data?.token).type === "subject-officer") {
+        history(`/subject-officer-dashboard/${data?.username}`);
+      } else if (jwtDecode(data?.token).type === "manager") {
+        history(`/manager-dashboard/${jwtDecode(data?.token).username}`);
+      } else {
+        history(`/user-dashboard/${jwtDecode(data?.token).username}`);
+      }
+    }
+  }, [loginSuccess]);
 
   const loginHandler = async (e) => {
     //handler method for login
-
-    setLoading(true);
     setIsError(false); //additional
 
     const config = {
@@ -45,37 +52,10 @@ const Login = ({ setIsTokenReceived }) => {
     };
 
     try {
-      const { data } = await axios.post(
-        "/api/auth/login",
-        { email: username, password },
-        config
-      );
-
-      localStorage.setItem("authToken", data?.token); //set the browser caching or local storage for globally accessed anywhere in the application
-      localStorage.setItem("username", data?.username);
-      localStorage.setItem("email", data?.email);
-      localStorage.setItem("type", data?.type);
-      localStorage.setItem("id", data?.empId);
-      localStorage.setItem("initials", data?.nameWithInitials);
-
-      setTimeout(() => {
-        // set a 5seconds timeout for authentication
-        setIsTokenReceived(true);
-        if (jwtDecode(data?.token).type === "subject-officer") {
-          history(`/subject-officer-dashboard/${data?.username}`);
-        } else if (jwtDecode(data?.token).type === "manager") {
-          history(`/manager-dashboard/${jwtDecode(data?.token).username}`);
-        } else {
-          history(`/user-dashboard/${jwtDecode(data?.token).username}`);
-        }
-
-        setLoading(false);
-        // window.location.reload();
-      }, 5000);
+      dispatch(loginUser({ email, password }));
     } catch (error) {
       setError(error.response.data.error);
       setAvailable(error.response.data.available);
-      setLoading(false);
       setIsError(true);
       setTimeout(() => {
         setError("");
@@ -141,8 +121,8 @@ const Login = ({ setIsTokenReceived }) => {
                   size={"large"}
                   placeholder={"e.g example@gmail.com"}
                   required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <label>Password</label>
                 <Input
@@ -172,8 +152,8 @@ const Login = ({ setIsTokenReceived }) => {
                       className="submit-btn"
                       htmlType="submit"
                       type={"primary"}
-                      disabled={loading}
-                      loading={loading}
+                      disabled={fetching}
+                      loading={fetching}
                     >
                       SUBMIT
                     </Button>
