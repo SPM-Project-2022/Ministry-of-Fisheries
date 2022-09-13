@@ -4,4 +4,13 @@ export const api = {
   loginUser: (payload) => {
     return post("/api/auth/login", payload);
   },
+  getSalaryDetails: () => {
+    return get("/salary");
+  },
+  submitSalary: (id, payload) => {
+    return put(`/salary/status/${id}`, payload);
+  },
+  notifyUserEmail: (payload) => {
+    return post("/salary/notify-user", payload);
+  },
 };

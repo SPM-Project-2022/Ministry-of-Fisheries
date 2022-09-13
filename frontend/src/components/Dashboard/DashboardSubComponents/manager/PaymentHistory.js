@@ -2,21 +2,29 @@ import { Table } from "antd";
 import axios from "axios";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+import { getSalaryDetails } from "../../DashboardRedux/dashboardActions";
 
 const PaymentHistory = () => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   const location = useLocation();
+  const dispatch = useDispatch();
+
+  const salary = useSelector(
+    (state) => state?.dashboard?.salary?.data?.data || []
+  );
+
+  const fetching = useSelector(
+    (state) => state?.dashboard?.salary?.fetching || false
+  );
 
   useEffect(() => {
-    if (location?.search.includes("history"))
-      (async () =>
-        await axios.get("/salary").then((res) => {
-          setData(res?.data?.filter(({ status }) => status === "PAID"));
-          setLoading(false);
-        }))();
+    if (location?.search.includes("history")) {
+      dispatch(getSalaryDetails());
+      setData(salary?.filter(({ status }) => status === "PAID"));
+    }
   }, [location.search]);
 
   const columns = [
@@ -81,7 +89,7 @@ const PaymentHistory = () => {
       <Table
         columns={columns}
         dataSource={data}
-        loading={loading}
+        loading={fetching}
         size={data?.length}
       />
     </div>
