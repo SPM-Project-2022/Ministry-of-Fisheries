@@ -1,8 +1,8 @@
 import axios from "axios";
 const access_token = localStorage.getItem("authToken");
 
-export const get = (path, config) =>
-  axios
+export const get = async (path, config) =>
+  await axios
     .get(`${path}`, { headers: config })
     .then((res) => {
       return res;
@@ -11,8 +11,8 @@ export const get = (path, config) =>
       throw error;
     });
 
-export const post = (path, body) =>
-  axios
+export const post = async (path, body) =>
+  await axios
     .post(`${path}`, body, {
       headers: { "Content-Type": "application/json" },
     })
@@ -23,8 +23,8 @@ export const post = (path, body) =>
       throw error;
     });
 
-export const put = (path, body) =>
-  axios
+export const put = async (path, body) =>
+  await axios
     .put(`${path}`, body, { headers: { "Content-Type": "application/json" } })
     .then((res) => {
       return res;
@@ -33,8 +33,8 @@ export const put = (path, body) =>
       throw error;
     });
 
-export const patch = (path, body) =>
-  axios
+export const patch = async (path, body) =>
+  await axios
     .patch(`${path}`, body, { headers: { "Content-Type": "application/json" } })
     .then((res) => {
       return res;
@@ -43,8 +43,8 @@ export const patch = (path, body) =>
       throw error;
     });
 
-export const deleteRequest = (path, payload, config) =>
-  axios
+export const deleteRequest = async (path, payload, config) =>
+  await axios
     .delete(`${path}`, { data: payload, headers: config })
     .then((res) => {
       return res;

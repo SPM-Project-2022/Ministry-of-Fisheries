@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Collapse,
-  Select,
   Form,
   notification,
   Empty,
@@ -12,44 +11,70 @@ import {
 } from "antd";
 import { useEffect } from "react";
 import { useState } from "react";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  clearSubmitSalary,
+  getSalaryDetails,
+  notifyUserEmail,
+  submitSalary,
+} from "../../DashboardRedux/dashboardActions";
 const { Panel } = Collapse;
 
 const Actions = () => {
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [toggle, setToggle] = useState(false);
   const [initialValues, setInitialValues] = useState({
     amount: null,
     finalPayment: null,
   });
-  const [submitted, setSubmitted] = useState(false);
+
   let [amount, setAmount] = useState(null);
 
   const [form] = Form.useForm();
   const search = window.location.search;
 
+  const dispatch = useDispatch();
+
+  const salary = useSelector(
+    (state) => state?.dashboard?.salary?.data?.data || []
+  );
+
+  const submitted = useSelector(
+    (state) => state?.dashboard?.submitSalary?.success?.status || false
+  );
+
+  const fetching = useSelector(
+    (state) => state?.dashboard?.salary?.fetching || false
+  );
+
   useEffect(() => {
-    (async () =>
-      await axios.get("/salary").then((res) => {
-        if (toggle) {
-          setData(res?.data?.filter(({ status }) => status !== "PENDING"));
-          setAmount(
-            res?.data
-              ?.filter(({ status }) => status !== "PENDING")
-              .map(({ amount }) => amount)
-          );
-        } else {
-          setData(res?.data?.filter(({ status }) => status === "PENDING"));
-          setAmount(
-            res?.data
-              ?.filter(({ status }) => status === "PENDING")
-              .map(({ amount }) => amount)
-          );
-        }
-        setLoading(false);
-      }))();
+    dispatch(getSalaryDetails());
+    if (toggle) {
+      setAmount(
+        salary
+          ?.filter(({ status }) => status !== "PENDING")
+          .map(({ amount }) => amount)
+      );
+    } else
+      setAmount(
+        salary
+          ?.filter(({ status }) => status === "PENDING")
+          .map(({ amount }) => amount)
+      );
+    if (submitted) {
+      notification.info({
+        message: `Notification`,
+        description: "Payment will be notified user through the email.",
+        placement: "topRight",
+      });
+      dispatch(clearSubmitSalary());
+    }
   }, [search, toggle, submitted]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearSubmitSalary());
+    };
+  }, []);
 
   const genExtra = (value) => (
     <span className={toggle ? "paid" : "pending"}>
@@ -66,30 +91,21 @@ const Actions = () => {
 
   const handleSubmit = async (value, index) => {
     try {
-      await axios
-        .put(`/salary/status/${value?._id}`, {
+      dispatch(
+        submitSalary(value?._id, {
           amount: initialValues[index].amount,
           finalPayment: initialValues[index].finalPayment,
           datePaid: new Date(),
         })
-        .then(
-          async () =>
-            await axios
-              .post("/salary/notify-user", {
-                email: value?.email,
-                type: "salary",
-              })
-              .then(() => {
-                notification.info({
-                  message: `Notification`,
-                  description:
-                    "Payment will be notified user through the email.",
-                  placement: "topRight",
-                });
-                setSubmitted(true);
-                setInitialValues({ amount: null, finalPayment: null });
-              })
-        );
+      );
+      dispatch(
+        notifyUserEmail({
+          email: value?.email,
+          type: "salary",
+        })
+      );
+
+      setInitialValues({ amount: null, finalPayment: null });
     } catch (error) {
       notification.error({
         message: "Something Went Wrong",
@@ -101,7 +117,6 @@ const Actions = () => {
 
   const handleToggle = (checked) => {
     setToggle(checked);
-    setLoading(true);
   };
 
   const setFinalPayment = (e, index, val) => {
@@ -118,7 +133,7 @@ const Actions = () => {
 
   const disablePermission = (value, btn = false, index = 0) => {
     if (btn) {
-      if (amount[index] === "null" || !amount[index]) return true;
+      if (amount?.[index] === "null" || !amount?.[index]) return true;
       return false;
     } else if (value?.status === "PENDING") {
       if (!(value?.workedDays >= 20)) return true;
@@ -140,11 +155,11 @@ const Actions = () => {
       <br />
       <br />
       <Collapse defaultActiveKey={["1"]}>
-        {loading ? (
+        {fetching ? (
           <center>
             <Spin size="large" style={{ marginTop: "200px" }} />
           </center>
-        ) : data.length === 0 ? (
+        ) : salary?.length === 0 ? (
           <center>
             {" "}
             <Empty
@@ -169,90 +184,99 @@ const Actions = () => {
             />
           </center>
         ) : (
-          data.map((value, index) => (
-            <Panel
-              header={setHeader(value)}
-              key={index + 1}
-              extra={genExtra(value?.status)}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <div>
-                  <span>No of Days Worked : {value?.workedDays}</span>
-                  <br />
-                  <span>
-                    Eligibility :{" "}
-                    {value?.workedDays >= 20 ? (
-                      <span style={{ color: "green" }}>ELIGIBLE</span>
-                    ) : (
-                      <span style={{ color: "red" }}>NOT ELIGIBLE</span>
-                    )}
-                  </span>
-                  <br />
-                  <span
-                    style={{
-                      fontSize: "10px",
-                      fontWeight: "bold",
-                      color: "red",
-                    }}
-                  >
-                    (Employees should be worked at least 20days)
-                  </span>
-                  <br />
-                  <span>Designation : {value?.designation}</span>
-                  <br />
-                  <span>
-                    Extra Fees :{" "}
-                    {value?.workedDays >= 20 ? (
-                      <span style={{ color: "green" }}>APPLICABLE</span>
-                    ) : (
-                      <span style={{ color: "red" }}>NOT APPLICABLE</span>
-                    )}
-                  </span>
-                  <br />
-                  <span>Extra Amount : Rs.{value?.extra}</span>
-                </div>
+          salary
+            ?.filter(({ status }) => {
+              if (toggle) return status === "PAID";
+              return status === "PENDING";
+            })
+            .map((value, index) => (
+              <Panel
+                header={setHeader(value)}
+                key={index + 1}
+                extra={genExtra(value?.status)}
+              >
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <div>
+                    <span>No of Days Worked : {value?.workedDays}</span>
+                    <br />
+                    <span>
+                      Eligibility :{" "}
+                      {value?.workedDays >= 20 ? (
+                        <span style={{ color: "green" }}>ELIGIBLE</span>
+                      ) : (
+                        <span style={{ color: "red" }}>NOT ELIGIBLE</span>
+                      )}
+                    </span>
+                    <br />
+                    <span
+                      style={{
+                        fontSize: "10px",
+                        fontWeight: "bold",
+                        color: "red",
+                      }}
+                    >
+                      (Employees should be worked at least 20days)
+                    </span>
+                    <br />
+                    <span>Designation : {value?.designation}</span>
+                    <br />
+                    <span>
+                      Extra Fees :{" "}
+                      {value?.workedDays >= 20 ? (
+                        <span style={{ color: "green" }}>APPLICABLE</span>
+                      ) : (
+                        <span style={{ color: "red" }}>NOT APPLICABLE</span>
+                      )}
+                    </span>
+                    <br />
+                    <span>Extra Amount : Rs.{value?.extra}</span>
+                  </div>
 
-                <Form form={form} onFinish={() => handleSubmit(value, index)}>
-                  <Form.Item
-                    name={[index, "amount"]}
-                    // rules={[{ required: true, message: "Amount is required!" }]}
-                  >
-                    Amount(Rs.) : {value?.status === "PAID"}
-                    <Input
-                      placeholder={!disablePermission(value) && "Enter amount"}
-                      disabled={disablePermission(value)}
-                      type={"number"}
-                      onChange={(e) =>
-                        setFinalPayment(e.target.value, index, value)
-                      }
-                      value={amount[index]}
-                    />
-                  </Form.Item>
+                  <Form form={form} onFinish={() => handleSubmit(value, index)}>
+                    <Form.Item
+                      name={[index, "amount"]}
+                      // rules={[{ required: true, message: "Amount is required!" }]}
+                    >
+                      Amount(Rs.) : {value?.status === "PAID"}
+                      <Input
+                        placeholder={
+                          !disablePermission(value) && "Enter amount"
+                        }
+                        disabled={disablePermission(value)}
+                        type={"number"}
+                        onChange={(e) =>
+                          setFinalPayment(e.target.value, index, value)
+                        }
+                        value={amount?.[index]}
+                      />
+                    </Form.Item>
 
-                  <Form.Item name={[index, "finalPayment"]}>
-                    Final Payment(Rs.) :{" "}
-                    <Input
-                      disabled
-                      type={"number"}
-                      value={getFinalPaymentValue(value, index)}
-                    />
-                  </Form.Item>
-                </Form>
-              </div>
-              {value?.status === "PENDING" && (
-                <div className="btn-submit-div">
-                  <Button
-                    disabled={disablePermission(value, true, index)}
-                    className="submit"
-                    type={"primary"}
-                    onClick={() => form.submit()}
-                  >
-                    SUBMIT
-                  </Button>
+                    <Form.Item name={[index, "finalPayment"]}>
+                      Final Payment(Rs.) :{" "}
+                      <Input
+                        disabled
+                        type={"number"}
+                        value={getFinalPaymentValue(value, index)}
+                      />
+                    </Form.Item>
+                  </Form>
                 </div>
-              )}
-            </Panel>
-          ))
+                {value?.status === "PENDING" && (
+                  <div className="btn-submit-div">
+                    <Button
+                      disabled={disablePermission(value, true, index)}
+                      className="submit"
+                      type={"primary"}
+                      onClick={() => form.submit()}
+                    >
+                      SUBMIT
+                    </Button>
+                  </div>
+                )}
+              </Panel>
+            ))
         )}
       </Collapse>
     </>
