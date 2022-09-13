@@ -1,5 +1,6 @@
 import { Spin } from "antd";
 import { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 //private route logic
@@ -9,7 +10,9 @@ function PrivateRoute({ children }) {
     setTimeout(() => setLoading(false), 5000);
   }, []);
 
-  if (localStorage.getItem("authToken") == null) {
+  const data = useSelector((state) => state?.auth?.login?.data?.data || {});
+
+  if (!Object.keys(data)?.length) {
     return (
       <>
         {loading ? (

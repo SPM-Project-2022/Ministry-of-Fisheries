@@ -8,12 +8,18 @@ import PageNotFound from "./routes/PageNotFound";
 import ResetPassword from "./components/Dashboard/DashboardSubComponents/ResetPassword";
 import jwtDecode from "jwt-decode";
 import ErrorBoundary from "./errorBoundary";
+import { useSelector } from "react-redux";
 
 const App = () => {
   // The back-to-top button is hidden at the beginning
   const [showButton, setShowButton] = useState(false);
-  const decodedToken = jwtDecode(localStorage.getItem("authToken"));
-  const [isTokenReceived, setIsTokenReceived] = useState(null);
+
+  const data = useSelector((state) => state?.auth?.login?.data?.data || null);
+  const loginSuccess = useSelector(
+    (state) => state?.auth?.login?.success?.status || false
+  );
+
+  const decodedToken = loginSuccess && jwtDecode(data?.token);
 
   useEffect(() => {
     window.addEventListener("scroll", () => {
@@ -23,7 +29,7 @@ const App = () => {
         setShowButton(false);
       }
     });
-  }, [isTokenReceived]);
+  }, []);
 
   // This function will scroll the window to the top
   const scrollToTop = () => {
@@ -38,10 +44,7 @@ const App = () => {
         <Router>
           <Routes>
             <Route path="*" element={<PageNotFound />} />
-            <Route
-              path="/"
-              element={<Login setIsTokenReceived={setIsTokenReceived} />}
-            />
+            <Route path="/" element={<Login />} />
             <Route
               path="/passwordreset/:resetToken"
               element={<ResetPassword />}
