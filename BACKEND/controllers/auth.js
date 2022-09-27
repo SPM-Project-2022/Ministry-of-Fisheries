@@ -268,6 +268,18 @@ exports.deleteById = async (req, res) => {
     .catch((err) => res.status(500).json({ success: false, err }));
 };
 
+exports.promotions = async (req, res) => {
+  const { id } = req.params;
+
+  const { designation } = req.body;
+
+  await User.findByIdAndUpdate(id, {
+    designation,
+  })
+    .then(() => res.json({ message: "Successfully Promoted" }))
+    .catch((err) => res.status(500).json({ err }));
+};
+
 const sendToken = (user, statusCode, res) => {
   //JWT get
   const token = user.getSignedToken();

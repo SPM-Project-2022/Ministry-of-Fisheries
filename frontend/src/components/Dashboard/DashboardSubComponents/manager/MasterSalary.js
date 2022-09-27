@@ -12,6 +12,7 @@ const MasterSalary = () => {
   const [designation, setDesignation] = useState(null);
   const [salary, setSalary] = useState(null);
   const [status, setStatus] = useState("");
+  const [id, setId] = useState(null);
   const [form] = Form.useForm();
 
   const columns = [
@@ -41,7 +42,19 @@ const MasterSalary = () => {
       title: "Status",
       render: (_, record) => (
         <div>
-          <DeleteOutlined className="icon-delete" />
+          <DeleteOutlined
+            className="icon-delete"
+            onClick={async () => {
+              await axios.delete(`/master-table/${record?._id}`).then(() => {
+                setSuccess(true);
+                notification.success({
+                  message: "Notification",
+                  description: `The role ${record?.designation} is successfull deleted.`,
+                  placement: "topRight",
+                });
+              });
+            }}
+          />
           &nbsp;&nbsp;&nbsp;&nbsp;
           <EditOutlined
             className="icon-edit"
@@ -50,6 +63,7 @@ const MasterSalary = () => {
               setDesignation(record?.designation);
               setSalary(record?.salary);
               setStatus("edit");
+              setId(record?._id);
             }}
           />
         </div>
@@ -57,16 +71,23 @@ const MasterSalary = () => {
     },
   ];
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (type) => {
     try {
-      await axios.post("/master-table", {
-        id: [...data]?.pop()?.id + 1,
-        designation,
-        salary,
-      });
+      type === "ADD"
+        ? await axios.post("/master-table", {
+            id: [...data]?.pop()?.id + 1,
+            designation,
+            salary,
+          })
+        : await axios.put(`/master-table/${id}`, {
+            designation,
+            salary,
+          });
       notification.success({
         message: "Notification",
-        description: `The role ${designation} is successfully added.`,
+        description: `The role ${designation} is successfully ${
+          type === "ADD" ? "added." : "updated."
+        }.`,
         placement: "topRight",
       });
       setSuccess(true);
@@ -87,6 +108,7 @@ const MasterSalary = () => {
         setVisible(false);
         setDesignation(null);
         setSalary(null);
+        setSuccess(false);
       }))();
   }, [success]);
 
@@ -121,7 +143,10 @@ const MasterSalary = () => {
         destroyOnClose={true}
       >
         <div>
-          <Form form={form} onFinish={() => handleSubmit()}>
+          <Form
+            form={form}
+            onFinish={() => handleSubmit(status === "edit" ? "UPDATE" : "ADD")}
+          >
             <Form.Item name={"designation"}>
               Role Name :{" "}
               <Input
