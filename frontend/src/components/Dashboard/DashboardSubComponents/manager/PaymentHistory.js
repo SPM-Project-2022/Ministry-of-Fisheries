@@ -1,5 +1,6 @@
-import { Table } from "antd";
-import axios from "axios";
+import { Button, Table } from "antd";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,6 +12,7 @@ const PaymentHistory = () => {
 
   const location = useLocation();
   const dispatch = useDispatch();
+  const doc = new jsPDF("p", "pt", "a2");
 
   const salary = useSelector(
     (state) => state?.dashboard?.salary?.data?.data || []
@@ -84,9 +86,44 @@ const PaymentHistory = () => {
     },
     { title: "Status", dataIndex: "status" },
   ];
+
+  const print = () => {
+    autoTable(doc, {
+      head: [
+        [
+          "PID",
+          "Name",
+          "Email",
+          "NIC",
+          "Designation",
+          "Amount",
+          "Date Paid",
+          "Status",
+        ],
+      ],
+      theme: "grid",
+      body: data.map((val) => [
+        val?._id,
+        val?.fullName,
+        val?.email,
+        val?.nic,
+        val?.designation,
+        val?.amount,
+        moment(val?.datePaid).format("DD MMM, YYYY"),
+        val?.status,
+      ]),
+    });
+
+    doc.save(`paymentHistory_${new Date()}.pdf`);
+  };
   return (
     <div>
+      <Button style={{ float: "right" }} onClick={print}>
+        Generate Report
+      </Button>
+      <br /> <br />
       <Table
+        id="printArea"
         columns={columns}
         dataSource={data}
         loading={fetching}
