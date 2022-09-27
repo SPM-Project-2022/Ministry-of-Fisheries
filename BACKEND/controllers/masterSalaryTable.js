@@ -26,26 +26,18 @@ exports.getAllSalaries = async (req, res) => {
 
 //SPRINT 2
 exports.updateSalaryIndex = async (req, res) => {
-  //   const { id } = req.params;
-  //   const { status } = req.body;
-  //   await MasterSalaryTable.findByIdAndUpdate(id, { status })
-  //     .then(() =>
-  //       res.status(200).json({ success: true, message: "Status Updated" })
-  //     )
-  //     .catch((err) => res.status(500).json({ success: false, message: err }));
+  const { id } = req.params;
+  const { designation, salary } = req.body;
+  await MasterSalaryTable.findByIdAndUpdate(id, { designation, salary })
+    .then(() =>
+      res.status(200).json({ success: true, message: "Status Updated" })
+    )
+    .catch((err) => res.status(500).json({ success: false, message: err }));
 };
 
 exports.deleteSalaryIndex = async (req, res) => {
-  //   const { id } = req.params;
-  //   const { amount, finalPayment, date } = req.body;
-  //   await MasterSalaryTable.findByIdAndUpdate(id, {
-  //     status: "PAID",
-  //     amount,
-  //     finalPayment,
-  //     date,
-  //   })
-  //     .then(() =>
-  //       res.status(200).json({ success: true, message: "Status Updated" })
-  //     )
-  //     .catch((err) => res.status(500).json({ success: false, message: err }));
+  const { id } = req.params;
+  await MasterSalaryTable.findByIdAndDelete(id)
+    .then(() => res.status(200).json({ success: true, message: "Deleted" }))
+    .catch((err) => res.status(500).json({ success: false, message: err }));
 };

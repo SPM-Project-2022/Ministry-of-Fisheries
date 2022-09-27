@@ -13,6 +13,20 @@ export const submitSalary = (id, payload) => {
   };
 };
 
+export const updateSalary = (id, payload) => {
+  return {
+    type: actions.UPDATE_MASTER_SALARY_TABLE_DETAILS,
+    payload: { id, payload },
+  };
+};
+
+export const deleteSalary = (id) => {
+  return {
+    type: actions.DELETE_MASTER_SALARY_TABLE_DETAILS,
+    payload: { id },
+  };
+};
+
 export const notifyUserEmail = (payload) => {
   return {
     type: actions.FETCH_SALARY_DETAILS,
