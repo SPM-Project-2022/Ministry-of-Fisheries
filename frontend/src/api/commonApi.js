@@ -13,4 +13,10 @@ export const api = {
   notifyUserEmail: (payload) => {
     return post("/salary/notify-user", payload);
   },
+  updateSalary: (id, payload) => {
+    return put(`/salary//${id}`, payload);
+  },
+  deleteSalary: (id) => {
+    return deleteRequest(`/salary/${id}`);
+  },
 };

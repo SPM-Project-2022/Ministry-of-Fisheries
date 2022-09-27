@@ -11,6 +11,7 @@ const MasterSalary = () => {
   const [success, setSuccess] = useState(false);
   const [designation, setDesignation] = useState(null);
   const [salary, setSalary] = useState(null);
+  const [status, setStatus] = useState("");
   const [form] = Form.useForm();
 
   const columns = [
@@ -38,11 +39,19 @@ const MasterSalary = () => {
     },
     {
       title: "Status",
-      render: () => (
+      render: (_, record) => (
         <div>
           <DeleteOutlined className="icon-delete" />
           &nbsp;&nbsp;&nbsp;&nbsp;
-          <EditOutlined className="icon-edit" />
+          <EditOutlined
+            className="icon-edit"
+            onClick={() => {
+              setVisible(true);
+              setDesignation(record?.designation);
+              setSalary(record?.salary);
+              setStatus("edit");
+            }}
+          />
         </div>
       ),
     },
@@ -99,13 +108,14 @@ const MasterSalary = () => {
         </Button>
       </div>
       <Modal
-        title="ADD ROLE"
+        title={status === "edit" ? "UPDATE ROLE" : "ADD ROLE"}
         visible={visible}
         onCancel={() => {
           setVisible(false);
           form.resetFields();
           setDesignation(null);
           setSalary(null);
+          setStatus("");
         }}
         footer={null}
         destroyOnClose={true}
@@ -117,6 +127,7 @@ const MasterSalary = () => {
               <Input
                 placeholder="Enter Role Name"
                 onChange={(e) => setDesignation(e.target.value)}
+                value={designation}
               />
             </Form.Item>
             <Form.Item name={"salary"}>
@@ -126,6 +137,7 @@ const MasterSalary = () => {
                 placeholder="Enter Salary"
                 type="number"
                 onChange={(e) => setSalary(e.target.value)}
+                value={salary}
               />
             </Form.Item>
             <Form.Item>
@@ -135,7 +147,7 @@ const MasterSalary = () => {
                   disabled={disablePermission()}
                   onClick={() => form.submit()}
                 >
-                  ADD
+                  {status === "edit" ? "UPDATE" : "ADD"}
                 </Button>
               </div>
             </Form.Item>
