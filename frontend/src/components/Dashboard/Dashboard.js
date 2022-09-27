@@ -14,6 +14,7 @@ import {
   CalculatorOutlined,
   WarningOutlined,
   TableOutlined,
+  PercentageOutlined,
 } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import "./styles/Dashboard.css";
@@ -33,6 +34,7 @@ import CalculateSalary from "./DashboardSubComponents/manager/CalculateSalary";
 import MasterSalary from "./DashboardSubComponents/manager/MasterSalary";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/authActions";
+import Promotions from "./DashboardSubComponents/manager/Promotions";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -56,6 +58,7 @@ const Dashboard = ({ user = null }) => {
   const queryUEdit = params.get("_userEdit");
   const queryCalcSal = params.get("_calcSal");
   const queryMasterTable = params.get("_salTable");
+  const queryPromo = params.get("_promo");
 
   const { username } = useParams();
 
@@ -108,6 +111,9 @@ const Dashboard = ({ user = null }) => {
       case "masterTable":
         document.getElementById("header").innerHTML = "Master Salary Table";
         break;
+      case "promo":
+        document.getElementById("header").innerHTML = "Promotions";
+        break;
       default:
         break;
     }
@@ -141,6 +147,7 @@ const Dashboard = ({ user = null }) => {
         case "manager":
           if (queryCalcSal == 1) return <CalculateSalary />;
           else if (queryMasterTable == 1) return <MasterSalary />;
+          else if (queryPromo == 1) return <Promotions />;
           else if (dashboard) return _displayWarning();
         case "user":
           if (queryProfile === "my") return <Profile />;
@@ -222,7 +229,8 @@ const Dashboard = ({ user = null }) => {
               ? ["1"]
               : queryA === "add" ||
                 queryProfile === "my" ||
-                queryUEdit === "true"
+                queryUEdit === "true" ||
+                queryPromo == 1
               ? ["2"]
               : queryH === "history"
               ? ["3"]
@@ -364,6 +372,18 @@ const Dashboard = ({ user = null }) => {
               >
                 Master Salary Table
               </Menu.Item>
+              <Menu.Item
+                key={"2"}
+                icon={<PercentageOutlined />}
+                onClick={() => {
+                  setHeader("promo");
+                  history(
+                    `/manager-dashboard/${loggedUser?.username}?_promo=1`
+                  );
+                }}
+              >
+                Promotions
+              </Menu.Item>
             </>
           )}
         </Menu>
@@ -414,6 +434,8 @@ const Dashboard = ({ user = null }) => {
               ? "Calculate Salary"
               : queryMasterTable == 1
               ? "Master Salary Table"
+              : queryPromo == 1
+              ? "Promotions"
               : "Dashboard"}
           </h1>
         </Header>
@@ -437,7 +459,8 @@ const Dashboard = ({ user = null }) => {
             !queryProfile &&
             !queryUEdit &&
             !queryCalcSal &&
-            !queryMasterTable && <CarouselView />}
+            !queryMasterTable &&
+            !queryPromo && <CarouselView />}
           {_getPermissionRoutes()}
         </Content>
         <Footer style={{ textAlign: "center" }}>
