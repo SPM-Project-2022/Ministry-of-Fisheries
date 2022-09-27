@@ -2,7 +2,7 @@ import * as actions from "./authActionsTypes";
 
 export const authReducer = (
   state = {
-    login: {
+    loginMinistry: {
       fetching: false,
       error: { status: false, message: "" },
       data: [],
@@ -14,8 +14,8 @@ export const authReducer = (
     case actions.LOGIN_DETAILS:
       return {
         ...state,
-        login: {
-          ...state.login,
+        loginMinistry: {
+          ...state.loginMinistry,
           fetching: true,
           error: { status: false, message: "" },
         },
@@ -23,8 +23,8 @@ export const authReducer = (
     case actions.LOGIN_DETAILS_SUCCESS:
       return {
         ...state,
-        login: {
-          ...state.login,
+        loginMinistry: {
+          ...state.loginMinistry,
           fetching: false,
           data: action.payload,
           error: { status: false, message: "" },
@@ -34,12 +34,19 @@ export const authReducer = (
     case actions.LOGIN_DETAILS_FAILED:
       return {
         ...state,
-        login: {
-          ...state.login,
+        loginMinistry: {
+          ...state.loginMinistry,
           fetching: false,
           error: { status: true, message: "" },
           success: { status: false, message: "" },
         },
+      };
+    case actions.LOG_OUT:
+      return {
+        ...state.loginMinistry,
+        fetching: false,
+        error: { status: true, message: "" },
+        success: { status: false, message: "" },
       };
 
     default:

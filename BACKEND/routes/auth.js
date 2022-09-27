@@ -10,6 +10,7 @@ const {
   getById,
   updateById,
   deleteById,
+  promotions,
 } = require("../controllers/auth");
 const { notifyUser } = require("../utils/notifyUser");
 
@@ -33,5 +34,7 @@ router.route("/get/:id").get(getById);
 router.route("/update/:id").put(updateById);
 
 router.route("/delete/:id").delete(deleteById);
+
+router.put("/promo/:id", promotions);
 
 module.exports = router;

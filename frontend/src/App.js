@@ -14,9 +14,11 @@ const App = () => {
   // The back-to-top button is hidden at the beginning
   const [showButton, setShowButton] = useState(false);
 
-  const data = useSelector((state) => state?.auth?.login?.data?.data || null);
+  const data = useSelector(
+    (state) => state?.auth?.loginMinistry?.data?.data || null
+  );
   const loginSuccess = useSelector(
-    (state) => state?.auth?.login?.success?.status || false
+    (state) => state?.auth?.loginMinistry?.success?.status || false
   );
 
   const decodedToken = loginSuccess && jwtDecode(data?.token);

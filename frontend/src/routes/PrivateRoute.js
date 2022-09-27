@@ -10,7 +10,9 @@ function PrivateRoute({ children }) {
     setTimeout(() => setLoading(false), 5000);
   }, []);
 
-  const data = useSelector((state) => state?.auth?.login?.data?.data || {});
+  const data = useSelector(
+    (state) => state?.auth?.loginMinistry?.data?.data || {}
+  );
 
   if (!Object.keys(data)?.length) {
     return (

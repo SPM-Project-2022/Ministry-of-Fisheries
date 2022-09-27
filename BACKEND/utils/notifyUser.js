@@ -1,9 +1,10 @@
 const { ET_1 } = require("../templates/ET_1");
 const { ET_2 } = require("../templates/ET_2");
+const { ET_3 } = require("../templates/ET_3");
 const sendEmail = require("./sendEmail");
 
 exports.notifyUser = async (req, res) => {
-  const { username, email, password, type = "login" } = req.body;
+  const { username, email, password, type = "login", role } = req.body;
 
   const setTemplate = () => {
     switch (type) {
@@ -11,6 +12,8 @@ exports.notifyUser = async (req, res) => {
         return ET_1(username, password);
       case "salary":
         return ET_2;
+      case "promo":
+        return ET_3(role);
       default:
         return "";
     }

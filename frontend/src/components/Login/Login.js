@@ -21,16 +21,25 @@ const Login = () => {
   const history = useNavigate();
   const dispatch = useDispatch();
 
-  const data = useSelector((state) => state?.auth?.login?.data?.data || null);
+  const data = useSelector(
+    (state) => state?.auth?.loginMinistry?.data?.data || null
+  );
   const loginSuccess = useSelector(
-    (state) => state?.auth?.login?.success?.status || false
+    (state) => state?.auth?.loginMinistry?.success?.status || false
   );
   const fetching = useSelector(
-    (state) => state?.auth?.login?.fetching || false
+    (state) => state?.auth?.loginMinistry?.fetching || false
   );
 
   useEffect(() => {
     if (loginSuccess) {
+      localStorage.setItem("authToken", data?.token); //set the browser caching or local storage for globally accessed anywhere in the application
+      localStorage.setItem("username", data?.username);
+      localStorage.setItem("email", data?.email);
+      localStorage.setItem("type", data?.type);
+      localStorage.setItem("id", data?.empId);
+      localStorage.setItem("initials", data?.nameWithInitials);
+
       if (jwtDecode(data?.token).type === "subject-officer") {
         history(`/subject-officer-dashboard/${data?.username}`);
       } else if (jwtDecode(data?.token).type === "manager") {
