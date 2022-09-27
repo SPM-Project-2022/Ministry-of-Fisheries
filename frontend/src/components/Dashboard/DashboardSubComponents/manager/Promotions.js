@@ -206,6 +206,7 @@ const Promotions = () => {
             );
         });
       setSuccess(true);
+      setPromo(null);
     } catch (error) {}
   };
 
@@ -222,7 +223,10 @@ const Promotions = () => {
       <Modal
         title={`PROMOTE: ${name}`}
         destroyOnClose={true}
-        onCancel={() => setVisible(false)}
+        onCancel={() => {
+          setVisible(false);
+          setPromo(null);
+        }}
         visible={visible}
         footer={null}
       >
