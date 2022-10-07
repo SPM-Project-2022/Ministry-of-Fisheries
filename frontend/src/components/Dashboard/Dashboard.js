@@ -35,6 +35,9 @@ import MasterSalary from "./DashboardSubComponents/manager/MasterSalary";
 import { useDispatch } from "react-redux";
 import { logout } from "../../redux/authActions";
 import Promotions from "./DashboardSubComponents/manager/Promotions";
+import UnOfficialEmps from "./DashboardSubComponents/UnOfficialEmps";
+import SubmitDocs from "./DashboardSubComponents/SubmitDocs";
+import Directory from "./DashboardSubComponents/Directory";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -59,6 +62,9 @@ const Dashboard = ({ user = null }) => {
   const queryCalcSal = params.get("_calcSal");
   const queryMasterTable = params.get("_salTable");
   const queryPromo = params.get("_promo");
+  const queryUn = params.get("un");
+  const queryDoc = params.get("doc");
+  const queryDir = params.get("dir");
 
   const { username } = useParams();
 
@@ -114,6 +120,15 @@ const Dashboard = ({ user = null }) => {
       case "promo":
         document.getElementById("header").innerHTML = "Promotions";
         break;
+      case "un":
+        document.getElementById("header").innerHTML = "UnOfficial Employees";
+        break;
+      case "doc":
+        document.getElementById("header").innerHTML = "Submit Document";
+        break;
+      case "dir":
+        document.getElementById("header").innerHTML = "Directory";
+        break;
       default:
         break;
     }
@@ -138,6 +153,9 @@ const Dashboard = ({ user = null }) => {
           if (loggedUser?.username === "Admin") {
             if (queryL === "leave") return <DisplayLeaves />;
             else if (queryR === "request") return <PasswordResetRequest />;
+            else if (queryUn === "un") return <UnOfficialEmps />;
+            else if (queryDoc === "doc") return <SubmitDocs />;
+            else if (queryDir === "dir") return <Directory />;
             else if (dashboard) return _displayWarning();
           } else if (queryE === "employee") return <DisplayEmployees />;
           else if (queryA === "add") return <AddEmployee />;
@@ -225,14 +243,16 @@ const Dashboard = ({ user = null }) => {
               : queryE === "employee" ||
                 queryEdit === "true" ||
                 queryMy === "view" ||
-                queryMasterTable == 1
+                queryMasterTable == 1 ||
+                queryUn === "un"
               ? ["1"]
               : queryA === "add" ||
                 queryProfile === "my" ||
                 queryUEdit === "true" ||
-                queryPromo == 1
+                queryPromo == 1 ||
+                queryDoc === "doc"
               ? ["2"]
-              : queryH === "history"
+              : queryH === "history" || queryDir === "dir"
               ? ["3"]
               : queryR === "request"
               ? ["4"]
@@ -242,18 +262,57 @@ const Dashboard = ({ user = null }) => {
           {loggedUser?.type === "subject-officer" ? (
             <>
               {loggedUser?.username === "Admin" && (
-                <Menu.Item
-                  key="0"
-                  icon={<PullRequestOutlined />}
-                  onClick={() => {
-                    setHeader("leave");
-                    history(
-                      `/subject-officer-dashboard/${loggedUser?.username}?_optL=leave`
-                    );
-                  }}
-                >
-                  Leave Requests
-                </Menu.Item>
+                <>
+                  {" "}
+                  <Menu.Item
+                    key="0"
+                    icon={<PullRequestOutlined />}
+                    onClick={() => {
+                      setHeader("leave");
+                      history(
+                        `/subject-officer-dashboard/${loggedUser?.username}?_optL=leave`
+                      );
+                    }}
+                  >
+                    Leave Requests
+                  </Menu.Item>
+                  <Menu.Item
+                    key="1"
+                    icon={<PullRequestOutlined />}
+                    onClick={() => {
+                      setHeader("un");
+                      history(
+                        `/subject-officer-dashboard/${loggedUser?.username}?un=un`
+                      );
+                    }}
+                  >
+                    UnOfficial Employees
+                  </Menu.Item>
+                  <Menu.Item
+                    key="2"
+                    icon={<PullRequestOutlined />}
+                    onClick={() => {
+                      setHeader("doc");
+                      history(
+                        `/subject-officer-dashboard/${loggedUser?.username}?doc=doc`
+                      );
+                    }}
+                  >
+                    Submit Documents
+                  </Menu.Item>
+                  <Menu.Item
+                    key="3"
+                    icon={<PullRequestOutlined />}
+                    onClick={() => {
+                      setHeader("dir");
+                      history(
+                        `/subject-officer-dashboard/${loggedUser?.username}?dir=dir`
+                      );
+                    }}
+                  >
+                    Directory
+                  </Menu.Item>
+                </>
               )}
               {loggedUser?.username === "subject-officer" && (
                 <>
@@ -436,6 +495,12 @@ const Dashboard = ({ user = null }) => {
               ? "Master Salary Table"
               : queryPromo == 1
               ? "Promotions"
+              : queryUn === "un"
+              ? "UnOfficial Employees"
+              : queryDir === "dir"
+              ? "Directory"
+              : queryDoc === "doc"
+              ? "Submit Documents"
               : "Dashboard"}
           </h1>
         </Header>
@@ -451,7 +516,10 @@ const Dashboard = ({ user = null }) => {
             !queryA &&
             !queryH &&
             !queryR &&
-            !queryEdit && <CarouselView />}
+            !queryEdit &&
+            !queryUn &&
+            !queryDir &&
+            !queryDoc && <CarouselView />}
           {username !== "subject-officer" &&
             username !== "Admin" &&
             !queryApply &&
