@@ -1,12 +1,18 @@
-import { EditOutlined } from "@ant-design/icons";
-import { Button, Modal, notification, Select, Spin, Table } from "antd";
+import { EditOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Input,
+  Modal,
+  notification,
+  Select,
+  Space,
+  Spin,
+  Table,
+} from "antd";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-function onChange(pagination, filters, sorter, extra) {
-  console.log("params", pagination, filters, sorter, extra);
-}
+import Highlighter from "react-highlight-words";
 
 const Promotions = () => {
   const [data, setData] = useState([]);
@@ -18,12 +24,16 @@ const Promotions = () => {
   const [loader, setLoader] = useState(true);
   const [success, setSuccess] = useState(false);
   const [email, setEmail] = useState("");
+
+
+  const [searchText, setSearchText] = useState("");
+  const searchInput = useRef(null);
   useEffect(() => {
     (async () => {
       await fetch("/api/auth")
         .then((res) => res.json())
         .then((json) => {
-          setData(json);
+          setData(json.filter((el) => el.type === "user"));
           setLoader(false);
           setSuccess(false);
         });
@@ -34,8 +44,100 @@ const Promotions = () => {
       }))();
   }, [success]);
 
-  const filteredData = data.filter((el) => el.type === "user");
   const history = useNavigate();
+
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+  };
+
+  const handleReset = (confirm, clearFilters, dataIndex) => {
+    clearFilters();
+    setSearchText("");
+    confirm({
+      closeDropdown: false,
+    });
+  };
+
+  const getColumnSearchProps = (dataIndex) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }) => (
+      <div
+        style={{
+          padding: 8,
+        }}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: "block",
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Search
+          </Button>
+          <Button
+            onClick={() =>
+              clearFilters && handleReset(confirm, clearFilters, dataIndex)
+            }
+            size="small"
+            style={{
+              width: 90,
+            }}
+          >
+            Reset
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? "#1890ff" : undefined,
+        }}
+      />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownVisibleChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: (text) => (
+      <>
+        <Highlighter
+          highlightStyle={{
+            backgroundColor: "#ffc069",
+            padding: 0,
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ""}
+        />
+      </>
+    ),
+  });
 
   const columns = [
     {
@@ -44,7 +146,7 @@ const Promotions = () => {
       // specify the condition of filtering result
       // here is that finding the name started with `value`
       sorter: (a, b) => a.empId - b.empId,
-      sortDirections: ["descend"],
+      sortDirections: ["ascend", "descend"],
       render: (text) => (
         <a
           onClick={() =>
@@ -69,6 +171,7 @@ const Promotions = () => {
       title: "Full Name",
       dataIndex: "fullName",
       sorter: (a, b) => a.fullName.length - b.fullName.length,
+      ...getColumnSearchProps("fullName"),
     },
     {
       title: "NIC",
@@ -214,11 +317,9 @@ const Promotions = () => {
     <>
       <Table
         columns={columns}
-        dataSource={filteredData}
-        onChange={onChange}
+        dataSource={data}
         loading={loader}
-        showHeader
-        sticky
+        scroll={{ x: "max-content" }}
       />
       <Modal
         title={`PROMOTE: ${name}`}
