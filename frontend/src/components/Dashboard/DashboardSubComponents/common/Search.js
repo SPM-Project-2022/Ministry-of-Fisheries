@@ -38,7 +38,7 @@ export const GetColumnSearchProps = (dataIndex) => {
           onChange={(e) =>
             setSelectedKeys(e.target.value ? [e.target.value] : [])
           }
-          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          onPressEnter={() => handleSearch(selectedKeys, confirm)}
           style={{
             marginBottom: 8,
             display: "block",
@@ -47,7 +47,7 @@ export const GetColumnSearchProps = (dataIndex) => {
         <Space>
           <Button
             type="primary"
-            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            onClick={() => handleSearch(selectedKeys, confirm)}
             icon={<SearchOutlined />}
             size="small"
             style={{
@@ -58,7 +58,7 @@ export const GetColumnSearchProps = (dataIndex) => {
           </Button>
           <Button
             onClick={() =>
-              clearFilters && handleReset(confirm, clearFilters, dataIndex)
+              clearFilters && handleReset(confirm, clearFilters)
             }
             size="small"
             style={{
