@@ -131,51 +131,51 @@ const Profile = () => {
       <table>
         <tr>
           <td>
-            <span style={{ color: "black" }}>🟩 Employee Id :</span> {empId}
+            <span style={{ color: "black" }}>🟨 Employee Id :</span> {empId}
           </td>
         </tr>
         <tr>
           <td>
-            <span style={{ color: "black" }}>🟩 Name With Initials:</span>{" "}
+            <span style={{ color: "black" }}>🟨 Name With Initials:</span>{" "}
             {nameWithInitials}
           </td>
         </tr>
         <tr>
           <td>
-            <span style={{ color: "black" }}>🟩 Full Name :</span> {fullName}
+            <span style={{ color: "black" }}>🟨 Full Name :</span> {fullName}
           </td>
         </tr>
         <tr>
           <td>
-            <span style={{ color: "black" }}>🟩 NIC :</span>{" "}
+            <span style={{ color: "black" }}>🟨 NIC :</span>{" "}
             {nic.length === 9 ? nic + "V" : nic}
           </td>
         </tr>
         <tr>
           <td>
-            <span style={{ color: "black" }}>🟩 Address :</span> {address}
+            <span style={{ color: "black" }}>🟨 Address :</span> {address}
           </td>
         </tr>
         <tr>
           <td>
-            <span style={{ color: "black" }}>🟩 Phone Number :</span>{" "}
+            <span style={{ color: "black" }}>🟨 Phone Number :</span>
             {phoneNumber}
           </td>
         </tr>
         <tr>
           <td>
-            <span style={{ color: "black" }}>🟩 Email :</span> {email}
+            <span style={{ color: "black" }}>🟨 Email :</span> {email}
           </td>
         </tr>
         <tr>
           <td>
-            <span style={{ color: "black" }}>🟩 Designation :</span>{" "}
+            <span style={{ color: "black" }}>🟨 Designation :</span>
             {designation}
           </td>
         </tr>
         <tr>
           <td>
-            <span style={{ color: "black" }}>🟩 Branch :</span> {branch}
+            <span style={{ color: "black" }}>🟨 Branch :</span> {branch}
           </td>
         </tr>
       </table>
