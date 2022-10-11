@@ -15,7 +15,6 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const [available, setAvailable] = useState("");
   const [isError, setIsError] = useState(false);
 
   const history = useNavigate();
@@ -29,6 +28,14 @@ const Login = () => {
   );
   const fetching = useSelector(
     (state) => state?.auth?.loginMinistry?.fetching || false
+  );
+
+  const isException = useSelector(
+    (state) => state?.auth?.loginMinistry?.error?.status || false
+  );
+
+  const errMsg = useSelector(
+    (state) => state?.auth?.loginMinistry?.error?.message?.error || false
   );
 
   useEffect(() => {
@@ -48,7 +55,14 @@ const Login = () => {
         history(`/user-dashboard/${jwtDecode(data?.token).username}`);
       }
     }
-  }, [loginSuccess]);
+    if (isException) {
+      setError(errMsg);
+      setIsError(true);
+      setTimeout(() => {
+        setError("");
+      }, 5000); //5s
+    }
+  }, [loginSuccess, isException]);
 
   const loginHandler = async (e) => {
     //handler method for login
@@ -60,17 +74,7 @@ const Login = () => {
       },
     };
 
-    try {
-      dispatch(loginUser({ email, password }));
-    } catch (error) {
-      setError(error.response.data.error);
-      setAvailable(error.response.data.available);
-      setIsError(true);
-      setTimeout(() => {
-        setError("");
-        setAvailable("");
-      }, 5000); //5s
-    }
+    dispatch(loginUser({ email, password }));
   };
 
   const showPassword = () => {
@@ -108,13 +112,8 @@ const Login = () => {
               <div className="title">Human Resource Management System</div>
               <center>
                 {error && (
-                  <span style={{ color: "white", background: "orange" }}>
-                    {error}
-                  </span>
-                )}
-                {available && (
                   <span style={{ color: "white", background: "red" }}>
-                    {available}
+                    {error}
                   </span>
                 )}
               </center>
@@ -126,7 +125,7 @@ const Login = () => {
                 <Input
                   label={"EMAIL"}
                   name={"email"}
-                  fieldType={"email"}
+                  type={"email"}
                   size={"large"}
                   placeholder={"e.g example@gmail.com"}
                   required
@@ -137,7 +136,6 @@ const Login = () => {
                 <Input
                   label={"PASSWORD"}
                   name={"password"}
-                  fieldType={"password"}
                   size={"large"}
                   type="password"
                   placeholder="type your password"
