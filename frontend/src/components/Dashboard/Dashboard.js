@@ -300,7 +300,7 @@ const Dashboard = ({ user = null }) => {
                       );
                     }}
                   >
-                    UnOfficial Employees
+                    Unofficial Employees
                   </Menu.Item>
                   <Menu.Item
                     key="2"
@@ -510,7 +510,7 @@ const Dashboard = ({ user = null }) => {
               : queryPromo == 1
               ? "Promotions"
               : queryUn === "un"
-              ? "UnOfficial Employees"
+              ? "Unofficial Employees"
               : queryDir === "dir"
               ? "Directory"
               : queryDoc === "doc"
