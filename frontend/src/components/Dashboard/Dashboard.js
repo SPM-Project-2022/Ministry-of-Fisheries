@@ -15,6 +15,9 @@ import {
   WarningOutlined,
   TableOutlined,
   PercentageOutlined,
+  FileSyncOutlined,
+  UploadOutlined
+  
 } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import "./styles/Dashboard.css";
@@ -277,7 +280,7 @@ const Dashboard = ({ user = null }) => {
                   {" "}
                   <Menu.Item
                     key="0"
-                    icon={<PullRequestOutlined />}
+                    icon={<FileSyncOutlined />}
                     onClick={() => {
                       setHeader("leave");
                       history(
@@ -289,7 +292,7 @@ const Dashboard = ({ user = null }) => {
                   </Menu.Item>
                   <Menu.Item
                     key="1"
-                    icon={<PullRequestOutlined />}
+                    icon={<UserAddOutlined />}
                     onClick={() => {
                       setHeader("un");
                       history(
@@ -301,7 +304,7 @@ const Dashboard = ({ user = null }) => {
                   </Menu.Item>
                   <Menu.Item
                     key="2"
-                    icon={<PullRequestOutlined />}
+                    icon={<UploadOutlined />}
                     onClick={() => {
                       setHeader("doc");
                       history(
@@ -313,7 +316,7 @@ const Dashboard = ({ user = null }) => {
                   </Menu.Item>
                   <Menu.Item
                     key="3"
-                    icon={<PullRequestOutlined />}
+                    icon={<AuditOutlined />}
                     onClick={() => {
                       setHeader("dir");
                       history(
