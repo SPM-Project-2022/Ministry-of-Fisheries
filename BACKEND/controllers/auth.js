@@ -83,7 +83,7 @@ exports.login = async (req, res) => {
       //true
       return res.status(401).json({
         success: false,
-        available: "User does not exists. Please contact your admin !",
+        error: "User does not exists. Please contact your admin !",
       });
     }
 
