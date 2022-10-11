@@ -37,7 +37,7 @@ export const authReducer = (
         loginMinistry: {
           ...state.loginMinistry,
           fetching: false,
-          error: { status: true, message: "" },
+          error: { status: true, message: action.message },
           success: { status: false, message: "" },
         },
       };

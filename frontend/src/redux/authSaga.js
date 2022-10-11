@@ -12,7 +12,7 @@ export const loginUser = function* ({ payload }) {
   } catch (e) {
     yield put({
       type: actions.LOGIN_DETAILS_FAILED,
-      message: e?.response?.data?.message,
+      message: e?.response?.data,
       code: e?.response?.status,
     });
   }
