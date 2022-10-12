@@ -24,7 +24,7 @@ router.route("/create").post(async (req, res) => {
     await newUnofficialEmployee
       .save()
       .then(() =>
-        res.status(200).json({ success: true, message: "Successfully UnofficialEmployee Added" })
+        res.status(200).json({ success: true, message: "UnofficialEmployee Added" })
       )
       .catch((err) => res.status(500).json({ success: false, err }));
   });
