@@ -162,6 +162,7 @@ const Dashboard = ({ user = null }) => {
             else if (dashboard) return _displayWarning();
           } else if (queryE === "employee") return <DisplayEmployees />;
           else if (queryA === "add") return <AddEmployee />;
+          else if (queryR === "request") return <PasswordResetRequest />;
           else if (queryH === "history") return <LeaveHistory />;
           else if (queryEdit === "true") return <EditEmployee />;
           else if (dashboard) return _displayWarning();

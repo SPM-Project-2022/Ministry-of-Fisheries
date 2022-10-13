@@ -1,6 +1,7 @@
 import { Spin, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { GetColumnSearchProps } from "./common/Search";
 
 function onChange(pagination, filters, sorter, extra) {
   console.log("params", pagination, filters, sorter, extra);
@@ -30,6 +31,7 @@ const DisplayEmployees = () => {
       // specify the condition of filtering result
       // here is that finding the name started with `value`
       sorter: (a, b) => a.empId - b.empId,
+      ...GetColumnSearchProps("empId"),
       sortDirections: ["descend"],
       render: (text) => (
         <a
@@ -50,16 +52,19 @@ const DisplayEmployees = () => {
       dataIndex: "nameWithInitials",
       // defaultSortOrder: "descend",
       sorter: (a, b) => a.nameWithInitials.length - b.nameWithInitials.length,
+      ...GetColumnSearchProps("nameWithInitials"),
     },
     {
       title: "Full Name",
       dataIndex: "fullName",
       sorter: (a, b) => a.fullName.length - b.fullName.length,
+      //...GetColumnSearchProps("fullName"),
     },
     {
       title: "NIC",
       dataIndex: "nic",
       sorter: (a, b) => a.nic.length - b.nic.length,
+      //...GetColumnSearchProps("nic"),
       render: (text) => (text.length === 9 ? text + "V" : text),
     },
     {
