@@ -128,7 +128,7 @@ const Actions = () => {
       [index]: {
         ...initialValues,
         amount: e,
-        finalPayment: parseInt(e) + parseInt(val?.extra),
+        finalPayment: parseFloat(e) + parseFloat(val?.extra),
       },
     });
     setInitialValues(form.getFieldsValue());
@@ -270,7 +270,7 @@ const Actions = () => {
                         }}
                         value={amount?.[index]}
                         maxLength={30}
-                        showCount
+                        showCount={!disablePermission(value)}
                       />
                     </Form.Item>
 
@@ -278,7 +278,7 @@ const Actions = () => {
                       Final Payment(Rs.) :{" "}
                       <Input
                         disabled
-                        type={"number"}
+                        maxLength={30}
                         value={getFinalPaymentValue(value, index)}
                       />
                     </Form.Item>
