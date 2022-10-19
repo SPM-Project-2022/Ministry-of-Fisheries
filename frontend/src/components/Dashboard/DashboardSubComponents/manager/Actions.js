@@ -52,13 +52,13 @@ const Actions = () => {
       setAmount(
         salary
           ?.filter(({ status }) => status !== "PENDING")
-          .map(({ amount }) => amount)
+          .map(({ amount }) => JSON.parse(amount))
       );
     } else
       setAmount(
         salary
           ?.filter(({ status }) => status === "PENDING")
-          .map(({ amount }) => amount)
+          .map(({ amount }) => JSON.parse(amount))
       );
     if (submitted) {
       notification.info({
@@ -117,6 +117,10 @@ const Actions = () => {
 
   const handleToggle = (checked) => {
     setToggle(checked);
+    setInitialValues({
+      amount: null,
+      finalPayment: null,
+    });
   };
 
   const setFinalPayment = (e, index, val) => {
@@ -154,102 +158,119 @@ const Actions = () => {
       </div>
       <br />
       <br />
-      <Collapse defaultActiveKey={["1"]}>
-        {fetching ? (
-          <center>
-            <Spin size="large" style={{ marginTop: "200px" }} />
-          </center>
-        ) : salary?.length === 0 ? (
-          <center>
-            {" "}
-            <Empty
-              description={
-                <>
-                  {toggle ? (
-                    <>
-                      {" "}
-                      <span>No Data</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>No Payments Remaining</span>
-                      <br />
-                      <span style={{ color: "red" }}>
-                        THERE ARE NO USERS TO PAY
-                      </span>
-                    </>
-                  )}
-                </>
-              }
-            />
-          </center>
-        ) : (
-          salary
-            ?.filter(({ status }) => {
-              if (toggle) return status === "PAID";
-              return status === "PENDING";
-            })
-            .map((value, index) => (
-              <Panel
-                header={setHeader(value)}
-                key={index + 1}
-                extra={genExtra(value?.status)}
-              >
-                <div
-                  style={{ display: "flex", justifyContent: "space-between" }}
+      <Form form={form}>
+        <Collapse defaultActiveKey={["1"]}>
+          {fetching ? (
+            <center>
+              <Spin size="large" style={{ marginTop: "200px" }} />
+            </center>
+          ) : salary?.length === 0 ? (
+            <center>
+              {" "}
+              <Empty
+                description={
+                  <>
+                    {toggle ? (
+                      <>
+                        {" "}
+                        <span>No Data</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>No Payments Remaining</span>
+                        <br />
+                        <span style={{ color: "red" }}>
+                          THERE ARE NO USERS TO PAY
+                        </span>
+                      </>
+                    )}
+                  </>
+                }
+              />
+            </center>
+          ) : (
+            salary
+              ?.filter(({ status }) => {
+                if (toggle) return status === "PAID";
+                return status === "PENDING";
+              })
+              .map((value, index) => (
+                <Panel
+                  header={setHeader(value)}
+                  key={index + 1}
+                  extra={genExtra(value?.status)}
+                  forceRender={true}
                 >
-                  <div>
-                    <span>No of Days Worked : {value?.workedDays}</span>
-                    <br />
-                    <span>
-                      Eligibility :{" "}
-                      {value?.workedDays >= 20 ? (
-                        <span style={{ color: "green" }}>ELIGIBLE</span>
-                      ) : (
-                        <span style={{ color: "red" }}>NOT ELIGIBLE</span>
-                      )}
-                    </span>
-                    <br />
-                    <span
-                      style={{
-                        fontSize: "10px",
-                        fontWeight: "bold",
-                        color: "red",
-                      }}
-                    >
-                      (Employees should be worked at least 20days)
-                    </span>
-                    <br />
-                    <span>Designation : {value?.designation}</span>
-                    <br />
-                    <span>
-                      Extra Fees :{" "}
-                      {value?.workedDays >= 20 ? (
-                        <span style={{ color: "green" }}>APPLICABLE</span>
-                      ) : (
-                        <span style={{ color: "red" }}>NOT APPLICABLE</span>
-                      )}
-                    </span>
-                    <br />
-                    <span>Extra Amount : Rs.{value?.extra}</span>
-                  </div>
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <div>
+                      <span>No of Days Worked : {value?.workedDays}</span>
+                      <br />
+                      <span>
+                        Eligibility :{" "}
+                        {value?.workedDays >= 20 ? (
+                          <span style={{ color: "green" }}>ELIGIBLE</span>
+                        ) : (
+                          <span style={{ color: "red" }}>NOT ELIGIBLE</span>
+                        )}
+                      </span>
+                      <br />
+                      <span
+                        style={{
+                          fontSize: "10px",
+                          fontWeight: "bold",
+                          color: "red",
+                        }}
+                      >
+                        (Employees should be worked at least 20days)
+                      </span>
+                      <br />
+                      <span>Designation : {value?.designation}</span>
+                      <br />
+                      <span>
+                        Extra Fees :{" "}
+                        {value?.workedDays >= 20 ? (
+                          <span style={{ color: "green" }}>APPLICABLE</span>
+                        ) : (
+                          <span style={{ color: "red" }}>NOT APPLICABLE</span>
+                        )}
+                      </span>
+                      <br />
+                      <span>Extra Amount : Rs.{value?.extra}</span>
+                    </div>
 
-                  <Form form={form} onFinish={() => handleSubmit(value, index)}>
                     <Form.Item
                       name={[index, "amount"]}
-                      // rules={[{ required: true, message: "Amount is required!" }]}
+                      rules={[
+                        ({ getFieldValue }) => ({
+                          validator(_, value) {
+                            if (!(parseInt(value).toString().length >= 16))
+                              return Promise.resolve();
+                            return Promise.reject(
+                              new Error("Maximum number limit exceeded.")
+                            );
+                          },
+                        }),
+                        {
+                          pattern: new RegExp(/^[0-9,.]{0,30}$/i),
+                          message: "Numbers only without spaces",
+                        },
+                      ]}
                     >
-                      Amount(Rs.) : {value?.status === "PAID"}
+                      Amount(Rs.) :
                       <Input
                         placeholder={
                           !disablePermission(value) && "Enter amount"
                         }
                         disabled={disablePermission(value)}
-                        type={"number"}
-                        onChange={(e) =>
-                          setFinalPayment(e.target.value, index, value)
-                        }
+                        onChange={(e) => {
+                          setFinalPayment(e.target.value, index, value);
+                          form.validateFields([[index, "amount"]]);
+                        }}
                         value={amount?.[index]}
+                        maxLength={30}
+                        showCount
                       />
                     </Form.Item>
 
@@ -261,24 +282,28 @@ const Actions = () => {
                         value={getFinalPaymentValue(value, index)}
                       />
                     </Form.Item>
-                  </Form>
-                </div>
-                {value?.status === "PENDING" && (
-                  <div className="btn-submit-div">
-                    <Button
-                      disabled={disablePermission(value, true, index)}
-                      className="submit"
-                      type={"primary"}
-                      onClick={() => form.submit()}
-                    >
-                      SUBMIT
-                    </Button>
                   </div>
-                )}
-              </Panel>
-            ))
-        )}
-      </Collapse>
+                  {value?.status === "PENDING" && (
+                    <div className="btn-submit-div">
+                      <Button
+                        disabled={disablePermission(value, true, index)}
+                        className="submit"
+                        type={"primary"}
+                        onClick={() =>
+                          form
+                            .validateFields()
+                            .then(() => handleSubmit(value, index))
+                        }
+                      >
+                        SUBMIT
+                      </Button>
+                    </div>
+                  )}
+                </Panel>
+              ))
+          )}
+        </Collapse>
+      </Form>
     </>
   );
 };

@@ -15,6 +15,7 @@ const MasterSalary = () => {
   const [status, setStatus] = useState("");
   const [id, setId] = useState(null);
   const [form] = Form.useForm();
+  const [isChanged, setIsChanged] = useState(false);
 
   const columns = [
     {
@@ -138,6 +139,7 @@ const MasterSalary = () => {
           setDesignation(null);
           setSalary(null);
           setStatus("");
+          setIsChanged(false);
         }}
         footer={null}
         destroyOnClose={true}
@@ -146,31 +148,70 @@ const MasterSalary = () => {
           <Form
             form={form}
             onFinish={() => handleSubmit(status === "edit" ? "UPDATE" : "ADD")}
+            initialValues={{ ...data.find((val) => val?._id === id) }}
           >
-            <Form.Item name={"designation"}>
-              Role Name :{" "}
+            <Form.Item
+              name={"designation"}
+              label={"Role Name"}
+              rules={[
+                {
+                  required: true,
+                  message: "This field is required.",
+                },
+              ]}
+            >
               <Input
                 placeholder="Enter Role Name"
-                onChange={(e) => setDesignation(e.target.value)}
+                onChange={(e) => {
+                  setDesignation(e.target.value);
+                  setIsChanged(true);
+                }}
                 value={designation}
               />
             </Form.Item>
-            <Form.Item name={"salary"}>
-              Salary(Rs.) :{" "}
+            <Form.Item
+              name={"salary"}
+              label={"Salary(Rs.)"}
+              rules={[
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!(parseInt(value).toString().length >= 16)) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(
+                      new Error("Maximum number limit exceeded.")
+                    );
+                  },
+                }),
+                {
+                  pattern: new RegExp(/^[0-9,.]{0,30}$/i),
+                  message: "Numbers only without spaces",
+                },
+                {
+                  required: true,
+                  message: "This field is required.",
+                },
+              ]}
+            >
               <Input
-                name={"salary"}
                 placeholder="Enter Salary"
-                type="number"
-                onChange={(e) => setSalary(e.target.value)}
+                maxLength={30}
+                onChange={(e) => {
+                  setSalary(e.target.value);
+                  setIsChanged(true);
+                }}
                 value={salary}
+                showCount
               />
             </Form.Item>
             <Form.Item>
               <div style={{ display: "flex", justifyContent: "center" }}>
                 <Button
                   type={"primary"}
-                  disabled={disablePermission()}
-                  onClick={() => form.submit()}
+                  disabled={disablePermission() || !isChanged}
+                  onClick={() =>
+                    form.validateFields().then(() => form.submit())
+                  }
                 >
                   {status === "edit" ? "UPDATE" : "ADD"}
                 </Button>
