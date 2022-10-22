@@ -11,6 +11,7 @@ const Attendance = new Schema({
   amount: String,
   finalPayment: String,
   datePaid: Date,
+  nic: String,
 });
 
 module.exports = mongoose.model("attendance", Attendance);

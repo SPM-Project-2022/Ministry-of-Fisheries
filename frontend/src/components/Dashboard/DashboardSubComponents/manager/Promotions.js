@@ -42,19 +42,7 @@ const Promotions = () => {
       // here is that finding the name started with `value`
       sorter: (a, b) => a.empId - b.empId,
       sortDirections: ["ascend", "descend"],
-      render: (text) => (
-        <a
-          onClick={() =>
-            history(
-              `/subject-officer-dashboard/${localStorage.getItem(
-                "username"
-              )}?_edit=true&_id=${text}`
-            )
-          }
-        >
-          {text}
-        </a>
-      ),
+      render: (text) => <a>{text}</a>,
     },
     {
       title: "Name with Initials",

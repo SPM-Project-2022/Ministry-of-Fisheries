@@ -303,7 +303,7 @@ const Dashboard = ({ user = null }) => {
                   >
                     Unofficial Employees
                   </Menu.Item>
-                  <Menu.Item
+                  {/* <Menu.Item
                     key="2"
                     icon={<UploadOutlined />}
                     onClick={() => {
@@ -326,7 +326,7 @@ const Dashboard = ({ user = null }) => {
                     }}
                   >
                     Directory
-                  </Menu.Item>
+                  </Menu.Item> */}
                 </>
               )}
               {loggedUser?.username === "subject-officer" && (
