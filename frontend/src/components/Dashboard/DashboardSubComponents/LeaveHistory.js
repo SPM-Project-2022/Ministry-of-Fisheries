@@ -89,7 +89,7 @@ const LeaveHistory = () => {
         ],
       ],
       theme: "grid",
-      body: data.map((val) => [
+      body: filteredData.map((val) => [
         val?.type,
         val?.reason,
         moment(val?.date).format("DD MMM, YYYY"),
