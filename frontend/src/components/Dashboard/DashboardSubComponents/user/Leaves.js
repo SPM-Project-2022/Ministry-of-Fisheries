@@ -1,11 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Card, Spin, notification, Modal, Button } from "antd";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { DeleteOutlined, InboxOutlined } from "@ant-design/icons";
 import moment from "moment";
+import { GetColumnSearchProps } from "../../DashboardSubComponents/common/Search";
 import "antd/dist/antd.css";
 
 const Leaves = () => {
+  const doc = new jsPDF("p", "pt", "a2");
   const [data, setData] = useState([]);
   const [loader, setLoader] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -58,9 +63,66 @@ const Leaves = () => {
       //   setTimeout(() => {}, 5000); //5s
     }
   };
+  const history = useNavigate();
+  const column = [
+    {
+      title: "Employee Id",
+      dataIndex: "empId",
+      // specify the condition of filtering result
+      // here is that finding the name started with `value`
+      sorter: (a, b) => a.empId - b.empId,
+      ...GetColumnSearchProps("empId"),
+      sortDirections: ["descend"],
+      render: (text) => (
+        <a
+          onClick={() =>
+            history(
+              `/subject-officer-dashboard/${localStorage.getItem(
+                "username"
+              )}?_edit=true&_id=${text}`
+            )
+          }
+        >
+          {text}
+        </a>
+      ),
+    },
+  ];
+
+  const print = () => {
+    autoTable(doc, {
+      head: [
+        [
+          "Leave Type",
+          "Reason",
+          "Leave Start Date",
+          "NIC",
+          "No of Days",
+          "Name",
+          "Status",
+        ],
+      ],
+      theme: "grid",
+      body: data.map((val) => [
+        val?.type,
+        val?.reason,
+        moment(val?.date).format("DD MMM, YYYY"),
+        val?.nic,
+        val?.duration,
+        val?.nameWithInitials,
+        val?.status,
+      ]),
+    });
+
+    doc.save(`leaveHistory_${new Date()}.pdf`);
+  };
 
   return (
     <>
+      <Button style={{ float: "right" }} onClick={print}>
+        Generate Report
+      </Button>
+      <br /> <br />
       {loader === false ? (
         <center>
           <Spin style={{ marginTop: "200px" }} />
@@ -95,7 +157,8 @@ const Leaves = () => {
                     <span>Reason : {value?.reason}</span>
                     <br />
                     <span>
-                      Leave Start Date : {moment(value?.date).format("DD/MM/YYYY")}
+                      Leave Start Date :{" "}
+                      {moment(value?.date).format("DD/MM/YYYY")}
                     </span>
                     <br />
                     <span>No of Days : {value?.duration} Day/s</span>

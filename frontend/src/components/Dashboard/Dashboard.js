@@ -16,8 +16,7 @@ import {
   TableOutlined,
   PercentageOutlined,
   FileSyncOutlined,
-  UploadOutlined
-  
+  UploadOutlined,
 } from "@ant-design/icons";
 import "antd/dist/antd.css";
 import "./styles/Dashboard.css";
@@ -30,8 +29,8 @@ import AddEmployee from "./DashboardSubComponents/AddEmployee";
 import EditEmployee from "./DashboardSubComponents/EditEmployee";
 import PasswordResetRequest from "./DashboardSubComponents/PasswordResetRequest";
 import LeaveRequest from "./DashboardSubComponents/LeaveRequest";
-import Profile from "./DashboardSubComponents/Profile";
-import Leaves from "./DashboardSubComponents/Leaves";
+import Profile from "./DashboardSubComponents/user/Profile";
+import Leaves from "./DashboardSubComponents/user/Leaves";
 import LeaveHistory from "./DashboardSubComponents/LeaveHistory";
 import CalculateSalary from "./DashboardSubComponents/manager/CalculateSalary";
 import MasterSalary from "./DashboardSubComponents/manager/MasterSalary";
