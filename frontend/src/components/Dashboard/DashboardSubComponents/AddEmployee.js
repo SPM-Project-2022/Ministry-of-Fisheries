@@ -389,7 +389,7 @@ const AddEmployee = () => {
                 </Tooltip>
               }
               showCount
-              maxLength={20}
+              maxLength={50}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
