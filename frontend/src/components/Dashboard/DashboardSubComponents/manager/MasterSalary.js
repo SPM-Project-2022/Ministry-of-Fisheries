@@ -16,6 +16,8 @@ const MasterSalary = () => {
   const [id, setId] = useState(null);
   const [form] = Form.useForm();
   const [isChanged, setIsChanged] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [deleteVidsible, setDeleteVidsible] = useState(false);
 
   const columns = [
     {
@@ -40,19 +42,14 @@ const MasterSalary = () => {
     },
     {
       title: "Status",
-      render: (_, record) => (
+      render: (_, record, index) => (
         <div>
           <DeleteOutlined
             className="icon-delete"
-            onClick={async () => {
-              await axios.delete(`/master-table/${record?._id}`).then(() => {
-                setSuccess(true);
-                notification.success({
-                  message: "Notification",
-                  description: `The role ${record?.designation} is successfull deleted.`,
-                  placement: "topRight",
-                });
-              });
+            onClick={() => {
+              setDeleteVidsible(true);
+              setDesignation(record?.designation);
+              setId(record?._id);
             }}
           />
           &nbsp;&nbsp;&nbsp;&nbsp;
@@ -64,6 +61,7 @@ const MasterSalary = () => {
               setSalary(record?.salary);
               setStatus("edit");
               setId(record?._id);
+              setIndex(index);
             }}
           />
         </div>
@@ -74,15 +72,31 @@ const MasterSalary = () => {
   const handleSubmit = async (type) => {
     try {
       type === "ADD"
-        ? await axios.post("/master-table", {
-            id: [...data]?.pop()?.id + 1,
-            designation,
-            salary,
-          })
-        : await axios.put(`/master-table/${id}`, {
-            designation,
-            salary,
-          });
+        ? await axios
+            .post("/master-table", {
+              id: [...data]?.pop()?.id + 1,
+              designation,
+              salary,
+            })
+            .then(() => {
+              setDesignation(null);
+              form.resetFields();
+              setSalary(null);
+              setStatus("");
+              setIsChanged(false);
+            })
+        : await axios
+            .put(`/master-table/${id}`, {
+              designation,
+              salary,
+            })
+            .then(() => {
+              setDesignation(null);
+              form.resetFields();
+              setSalary(null);
+              setStatus("");
+              setIsChanged(false);
+            });
       notification.success({
         message: "Notification",
         description: `The role ${designation} is successfully ${
@@ -126,7 +140,13 @@ const MasterSalary = () => {
         scroll={{ x: "max-content" }}
       />
       <div>
-        <Button className="btn-role" onClick={() => setVisible(true)}>
+        <Button
+          className="btn-role"
+          onClick={() => {
+            setVisible(true);
+            setStatus("add");
+          }}
+        >
           +ADD ROLE
         </Button>
       </div>
@@ -144,81 +164,106 @@ const MasterSalary = () => {
         footer={null}
         destroyOnClose={true}
       >
-        <div>
-          <Form
-            form={form}
-            onFinish={() => handleSubmit(status === "edit" ? "UPDATE" : "ADD")}
-            initialValues={{ ...data.find((val) => val?._id === id) }}
-          >
-            <Form.Item
-              name={"designation"}
-              label={"Role Name"}
-              rules={[
-                {
-                  required: true,
-                  message: "This field is required.",
-                },
-              ]}
-            >
-              <Input
-                placeholder="Enter Role Name"
-                onChange={(e) => {
-                  setDesignation(e.target.value);
-                  setIsChanged(true);
-                }}
-                value={designation}
-              />
-            </Form.Item>
-            <Form.Item
-              name={"salary"}
-              label={"Salary(Rs.)"}
-              rules={[
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!(parseInt(value).toString().length >= 16)) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(
-                      new Error("Maximum number limit exceeded.")
-                    );
-                  },
-                }),
-                {
-                  pattern: new RegExp(/^[0-9,.]{0,30}$/i),
-                  message: "Numbers only without spaces",
-                },
-                {
-                  required: true,
-                  message: "This field is required.",
-                },
-              ]}
-            >
-              <Input
-                placeholder="Enter Salary"
-                maxLength={30}
-                onChange={(e) => {
-                  setSalary(e.target.value);
-                  setIsChanged(true);
-                }}
-                value={salary}
-                showCount
-              />
-            </Form.Item>
-            <Form.Item>
-              <div style={{ display: "flex", justifyContent: "center" }}>
-                <Button
-                  type={"primary"}
-                  disabled={disablePermission() || !isChanged}
-                  onClick={() =>
-                    form.validateFields().then(() => form.submit())
+        <Form
+          form={form}
+          onFinish={() => handleSubmit(status === "edit" ? "UPDATE" : "ADD")}
+        >
+          <Form.Item name={"designation"} label={"Role Name"}>
+            <Input
+              placeholder="Enter Role Name"
+              onChange={(e) => {
+                setDesignation(e.target.value);
+                setIsChanged(true);
+              }}
+              defaultValue={status === "edit" ? data[index]?.designation : null}
+            />
+          </Form.Item>
+          <Form.Item
+            name={"salary"}
+            label={"Salary(Rs.)"}
+            rules={[
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!(parseInt(value).toString().length >= 16)) {
+                    return Promise.resolve();
                   }
-                >
-                  {status === "edit" ? "UPDATE" : "ADD"}
-                </Button>
-              </div>
-            </Form.Item>
-          </Form>
-        </div>
+                  return Promise.reject(
+                    new Error("Maximum number limit exceeded.")
+                  );
+                },
+              }),
+              {
+                pattern: new RegExp(/^[0-9,.]{0,30}$/i),
+                message: "Numbers only without spaces",
+              },
+            ]}
+          >
+            <Input
+              placeholder="Enter Salary"
+              maxLength={30}
+              onChange={(e) => {
+                setSalary(e.target.value);
+                setIsChanged(true);
+              }}
+              defaultValue={status === "edit" ? data[index]?.salary : null}
+              showCount
+            />
+          </Form.Item>
+          <Form.Item>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                type={"primary"}
+                disabled={disablePermission() || !isChanged}
+                onClick={() => form.validateFields().then(() => form.submit())}
+              >
+                {status === "edit" ? "UPDATE" : "ADD"}
+              </Button>
+            </div>
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Modal
+        title={"DELETE"}
+        visible={deleteVidsible}
+        onCancel={() => {
+          setDeleteVidsible(false);
+          setDesignation(null);
+          setId(null);
+        }}
+        footer={null}
+      >
+        <center>
+          {" "}
+          Are you sure to delete? <br />
+          <br />
+          <br />
+          <Button
+            style={{ color: "white", backgroundColor: "red" }}
+            onClick={async () => {
+              await axios.delete(`/master-table/${id}`).then(() => {
+                setSuccess(true);
+                notification.success({
+                  message: "Notification",
+                  description: `The role ${designation} is successfull deleted.`,
+                  placement: "topRight",
+                });
+                setDeleteVidsible(false);
+              });
+            }}
+          >
+            DELETE
+          </Button>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <Button
+            onClick={() => {
+              setDesignation(null);
+              setId(null);
+              setDeleteVidsible(false);
+            }}
+          >
+            CANCEL
+          </Button>
+        </center>
       </Modal>
     </div>
   );
