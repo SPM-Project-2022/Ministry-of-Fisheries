@@ -40,6 +40,7 @@ import Promotions from "./DashboardSubComponents/manager/Promotions";
 import UnOfficialEmps from "./DashboardSubComponents/UnOfficialEmps";
 import SubmitDocs from "./DashboardSubComponents/SubmitDocs";
 import Directory from "./DashboardSubComponents/Directory";
+import MarkAttendance from "./DashboardSubComponents/user/MarkAttendance";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -60,6 +61,7 @@ const Dashboard = ({ user = null }) => {
   const queryApply = params.get("_optApply");
   const queryMy = params.get("_my");
   const queryProfile = params.get("_profile");
+  const queryAttendance = params.get("_attendance");
   const queryUEdit = params.get("_userEdit");
   const queryCalcSal = params.get("_calcSal");
   const queryMasterTable = params.get("_salTable");
@@ -112,6 +114,9 @@ const Dashboard = ({ user = null }) => {
         break;
       case "profile":
         document.getElementById("header").innerHTML = "My Profile";
+        break;
+      case "attendance":
+        document.getElementById("header").innerHTML = "Mark Attendance";
         break;
       case "calc_salary":
         document.getElementById("header").innerHTML = "Calculate Salary";
@@ -175,6 +180,7 @@ const Dashboard = ({ user = null }) => {
           else if (queryApply === "true") return <LeaveRequest />;
           else if (queryUEdit === "true") return <EditEmployee />;
           else if (queryMy === "view") return <Leaves />;
+          else if (queryAttendance === "true") return <MarkAttendance />;
           else if (dashboard) return _displayWarning();
         default:
           return <></>;
@@ -266,7 +272,9 @@ const Dashboard = ({ user = null }) => {
                 queryPromo == 1 ||
                 queryDoc === "doc"
               ? ["2"]
-              : queryH === "history" || queryDir === "dir"
+              : queryH === "history" ||
+                queryDir === "dir" ||
+                queryAttendance === "true"
               ? ["3"]
               : queryR === "request"
               ? ["4"]
@@ -418,6 +426,18 @@ const Dashboard = ({ user = null }) => {
               >
                 Profile
               </Menu.Item>
+              <Menu.Item
+                key="3"
+                icon={<CrownOutlined />}
+                onClick={() => {
+                  setHeader("attendance");
+                  history(
+                    `/user-dashboard/${loggedUser?.username}?_attendance=true`
+                  );
+                }}
+              >
+                Mark Attendance
+              </Menu.Item>
             </>
           ) : (
             <>
@@ -499,7 +519,9 @@ const Dashboard = ({ user = null }) => {
               ? "Apply For Leave"
               : queryMy === "view"
               ? "My Leaves"
-              : queryProfile === "my"
+              : queryProfile === "attendance"
+              ? "Mark Attendance"
+              : queryAttendance === "my"
               ? "My Profile"
               : queryUEdit === "true"
               ? "Edit Your Profile"
@@ -539,6 +561,7 @@ const Dashboard = ({ user = null }) => {
             !queryApply &&
             !queryMy &&
             !queryProfile &&
+            !queryAttendance &&
             !queryUEdit &&
             !queryCalcSal &&
             !queryMasterTable &&

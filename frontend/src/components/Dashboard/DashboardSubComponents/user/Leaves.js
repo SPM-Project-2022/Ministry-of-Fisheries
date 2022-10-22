@@ -14,6 +14,10 @@ const Leaves = () => {
   const [data, setData] = useState([]);
   const [loader, setLoader] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [query, setQuery] = useState("");
+  const [newdata, setNewdata] = useState("");
+
+  useEffect(() => {}, [query]);
 
   useEffect(() => {
     (async () => {
@@ -63,32 +67,8 @@ const Leaves = () => {
       //   setTimeout(() => {}, 5000); //5s
     }
   };
-  const history = useNavigate();
-  const column = [
-    {
-      title: "Employee Id",
-      dataIndex: "empId",
-      // specify the condition of filtering result
-      // here is that finding the name started with `value`
-      sorter: (a, b) => a.empId - b.empId,
-      ...GetColumnSearchProps("empId"),
-      sortDirections: ["descend"],
-      render: (text) => (
-        <a
-          onClick={() =>
-            history(
-              `/subject-officer-dashboard/${localStorage.getItem(
-                "username"
-              )}?_edit=true&_id=${text}`
-            )
-          }
-        >
-          {text}
-        </a>
-      ),
-    },
-  ];
 
+  console.log("query", query);
   const print = () => {
     autoTable(doc, {
       head: [
@@ -119,6 +99,7 @@ const Leaves = () => {
 
   return (
     <>
+      <input placeholder="Search" onChange={(e) => setQuery(e.target.value)} />
       <Button style={{ float: "right" }} onClick={print}>
         Generate Report
       </Button>
@@ -129,7 +110,10 @@ const Leaves = () => {
         </center>
       ) : (
         <>
-          {filteredData.length === 0 ? (
+          {[...filteredData].filter(
+            (value) =>
+              value.type.toLowerCase().indexOf(query.toLowerCase()) >= 0
+          ).length === 0 ? (
             <>
               <center>
                 <span style={{ fontSize: "30px" }}>
@@ -140,89 +124,96 @@ const Leaves = () => {
               </center>
             </>
           ) : (
-            filteredData.map((value) => {
-              return (
-                <div
-                  style={{
-                    display: "inline-block",
-                    marginLeft: "40px",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <Card
-                    title={value?.type}
-                    //extra={<a href="#">More</a>}
-                    style={{ width: 300 }}
+            [...filteredData]
+              .filter(
+                (value) =>
+                  value.type.toLowerCase().indexOf(query.toLowerCase()) >= 0
+              )
+              .map((value) => {
+                return (
+                  <div
+                    style={{
+                      display: "inline-block",
+                      marginLeft: "40px",
+                      marginBottom: "10px",
+                    }}
                   >
-                    <span>Reason : {value?.reason}</span>
-                    <br />
-                    <span>
-                      Leave Start Date :{" "}
-                      {moment(value?.date).format("DD/MM/YYYY")}
-                    </span>
-                    <br />
-                    <span>No of Days : {value?.duration} Day/s</span>
-                    <br />
-                    <span>
-                      Substitute Person's NIC :{" "}
-                      {value?.nic.length === 9 ? value?.nic + "V" : value?.nic}
-                    </span>
-                    <br />
-                    <span>Substitute Person : {value?.name}</span>
-                    <br />
-                    <br />
-                    <div>
-                      <span>
-                        Status :{" "}
-                        {value?.status === "pending" ? (
-                          <span style={{ color: "orange" }}>
-                            {value?.status.toUpperCase()}
-                          </span>
-                        ) : value?.status === "accepted" ? (
-                          <span style={{ color: "green" }}>
-                            {value?.status.toUpperCase()}
-                          </span>
-                        ) : (
-                          <span style={{ color: "red" }}>
-                            {value?.status.toUpperCase()}
-                          </span>
-                        )}
-                      </span>
-                      <span
-                        style={{
-                          float: "right",
-                          color: "red",
-                          fontSize: "15px",
-                        }}
-                      >
-                        {" "}
-                        <DeleteOutlined onClick={showModal} />
-                      </span>
-                    </div>
-                    <Modal
-                      visible={visible}
-                      title="Are you sure to delete ?"
-                      onCancel={handleCancel}
-                      footer={false}
+                    <Card
+                      title={value?.type}
+                      //extra={<a href="#">More</a>}
+                      style={{ width: 300 }}
                     >
-                      <center>
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          onClick={() => deleteHandler(value?._id)}
+                      <span>Reason : {value?.reason}</span>
+                      <br />
+                      <span>
+                        Leave Start Date :{" "}
+                        {moment(value?.date).format("DD/MM/YYYY")}
+                      </span>
+                      <br />
+                      <span>No of Days : {value?.duration} Day/s</span>
+                      <br />
+                      <span>
+                        Substitute Person's NIC :{" "}
+                        {value?.nic.length === 9
+                          ? value?.nic + "V"
+                          : value?.nic}
+                      </span>
+                      <br />
+                      <span>Substitute Person : {value?.name}</span>
+                      <br />
+                      <br />
+                      <div>
+                        <span>
+                          Status :{" "}
+                          {value?.status === "pending" ? (
+                            <span style={{ color: "orange" }}>
+                              {value?.status.toUpperCase()}
+                            </span>
+                          ) : value?.status === "accepted" ? (
+                            <span style={{ color: "green" }}>
+                              {value?.status.toUpperCase()}
+                            </span>
+                          ) : (
+                            <span style={{ color: "red" }}>
+                              {value?.status.toUpperCase()}
+                            </span>
+                          )}
+                        </span>
+                        <span
+                          style={{
+                            float: "right",
+                            color: "red",
+                            fontSize: "15px",
+                          }}
                         >
-                          Delete
-                        </Button>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        <Button htmlType="button" onClick={handleCancel}>
-                          Cancel
-                        </Button>
-                      </center>
-                    </Modal>
-                  </Card>
-                </div>
-              );
-            })
+                          {" "}
+                          <DeleteOutlined onClick={showModal} />
+                        </span>
+                      </div>
+                      <Modal
+                        visible={visible}
+                        title="Are you sure to delete ?"
+                        onCancel={handleCancel}
+                        footer={false}
+                      >
+                        <center>
+                          <Button
+                            type="primary"
+                            htmlType="submit"
+                            onClick={() => deleteHandler(value?._id)}
+                          >
+                            Delete
+                          </Button>
+                          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                          <Button htmlType="button" onClick={handleCancel}>
+                            Cancel
+                          </Button>
+                        </center>
+                      </Modal>
+                    </Card>
+                  </div>
+                );
+              })
           )}
         </>
       )}
