@@ -15,6 +15,7 @@ import {
 } from "@ant-design/icons";
 
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const layout = {
   labelCol: {
@@ -45,6 +46,7 @@ const AddEmployee = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const type = "user";
+  const history = useNavigate();
 
   const [loading, setLoading] = useState(false); //additional
   const [error, setError] = useState(false);
@@ -101,6 +103,7 @@ const AddEmployee = () => {
           description: "Successfully Submitted the user details 😘",
           placement,
         });
+        history("/subject-officer-dashboard/subject-officer?_optE=employee");
         form.resetFields();
       }, 5000); //5seconds timeout
     } catch (error) {
@@ -110,7 +113,7 @@ const AddEmployee = () => {
         placement,
       });
       setError(true);
-      form.resetFields();
+      //form.resetFields();
       setLoading(false);
     }
   };
@@ -389,7 +392,7 @@ const AddEmployee = () => {
                 </Tooltip>
               }
               showCount
-              maxLength={20}
+              maxLength={50}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />

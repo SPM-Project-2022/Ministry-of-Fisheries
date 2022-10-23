@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "antd/dist/antd.css";
-import { Form, Input, Button, Spin, Tooltip, notification } from "antd";
+import { Form, Input, Button, Spin, Tooltip, notification, Modal } from "antd";
 import TextArea from "antd/lib/input/TextArea";
 import {
   BranchesOutlined,
@@ -43,6 +43,7 @@ const EditEmployee = () => {
   const [designation, setDesignation] = useState("");
   const [branch, setBranch] = useState("");
   const [_id, set_id] = useState("");
+  const [deleteVidsible, setDeleteVidsible] = useState(false);
 
   const search = window.location.search;
   const params = new URLSearchParams(search);
@@ -112,6 +113,7 @@ const EditEmployee = () => {
           description: "Successfully updated the user details 😘",
           placement,
         });
+        history("/subject-officer-dashboard/subject-officer?_optE=employee");
         form.resetFields();
       }, 5000); //5seconds timeout
     } catch (error) {
@@ -121,7 +123,7 @@ const EditEmployee = () => {
         placement,
       });
       setError(true);
-      form.resetFields();
+      //form.resetFields();
       setLoading(false);
     }
   };
@@ -428,7 +430,7 @@ const EditEmployee = () => {
               <Button
                 type="dashed"
                 htmlType="button"
-                onClick={() => deleteHandler("top")}
+                onClick={() => setDeleteVidsible(true)}
                 icon={<DeleteOutlined />}
               >
                 {deleting ? (
@@ -443,6 +445,35 @@ const EditEmployee = () => {
           </Form.Item>
         </Form>
       )}
+      <Modal
+        title={"DELETE"}
+        visible={deleteVidsible}
+        onCancel={() => {
+          setDeleteVidsible(false);
+        }}
+        footer={null}
+      >
+        <center>
+          {" "}
+          Are you sure to delete? <br />
+          <br />
+          <br />
+          <Button
+            style={{ color: "white", backgroundColor: "red" }}
+            onClick={() => deleteHandler("top")}
+          >
+            DELETE
+          </Button>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          <Button
+            onClick={() => {
+              setDeleteVidsible(false);
+            }}
+          >
+            CANCEL
+          </Button>
+        </center>
+      </Modal>
     </>
   );
 };
